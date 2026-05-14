@@ -7,7 +7,7 @@
   width: 100%;
 }
 
-/* ── LEFT — photo (exactly half the viewport) ── */
+/* ── LEFT — photo ── */
 .photoCol {
   flex: 1;
   display: flex;
@@ -34,7 +34,7 @@
   text-align: center;
 }
 
-/* ── RIGHT — text (exactly half the viewport) ── */
+/* ── RIGHT — text ── */
 .textCol {
   flex: 1;
   display: flex;
@@ -52,12 +52,11 @@
   border-radius: 4px;
   padding: 10px 20px;
   margin-bottom: 10px;
-  /* fixed size — text animates inside without resizing the box */
   width: 460px;
   height: 108px;
 }
 
-/* corner handles — same style as Figma selection corners */
+/* corner handles */
 .cornerTL,
 .cornerTR,
 .cornerBL,
@@ -69,8 +68,8 @@
   border-radius: 1px;
 }
 
-.cornerTL { top: -5px;  left: -5px;  }
-.cornerTR { top: -5px;  right: -5px; }
+.cornerTL { top: -5px;    left: -5px;  }
+.cornerTR { top: -5px;    right: -5px; }
 .cornerBL { bottom: -5px; left: -5px;  }
 .cornerBR { bottom: -5px; right: -5px; }
 
@@ -115,38 +114,36 @@
   max-width: 420px;
 }
 
-/* ── RESPONSIVE ── */
+/* ── tablet (1100px) ── */
 @media (max-width: 1100px) {
-  .photoCol {
-    padding: 0 40px 0 40px;
-  }
+  .photoCol { padding: 0 32px 0 40px; }
+  .textCol  { padding: 0 40px 0 32px; }
 
-  .textCol {
-    padding: 0 40px 0 40px;
+  .typingBox {
+    width: 340px;
+    height: 84px;
   }
 
   .typingText,
-  .cursor {
-    font-size: 60px;
-  }
+  .cursor   { font-size: 60px; }
 
-  .headline {
-    font-size: 66px;
-  }
+  .headline { font-size: 66px; white-space: normal; }
 }
 
+/* ── tablet/mobile (768px) — stack vertically ── */
 @media (max-width: 768px) {
   .hero {
     flex-direction: column;
-    padding: 120px 24px 60px;
-    gap: 40px;
+    align-items: center;
+    padding: 90px 24px 60px;
+    gap: 32px;
   }
 
   .photoCol,
   .textCol {
     flex: none;
     width: 100%;
-    padding: 0;
+    padding: 0 20px;
     align-items: center;
   }
 
@@ -155,15 +152,53 @@
   }
 
   .photo {
-    max-width: 320px;
+    max-width: 300px;
+  }
+
+  .name { font-size: 48px; }
+
+  .typingBox {
+    width: 100%;
+    max-width: 340px;
+    height: 80px;
   }
 
   .typingText,
-  .cursor {
-    font-size: 44px;
-  }
+  .cursor   { font-size: 52px; }
 
   .headline {
-    font-size: 48px;
+    font-size: 52px;
+    white-space: normal;
   }
+
+  .sub { font-size: 15px; max-width: 100%; }
+}
+
+/* ── mobile (480px) ── */
+@media (max-width: 480px) {
+  .hero {
+    padding: 80px 16px 48px;
+    gap: 24px;
+  }
+
+  .photoCol,
+  .textCol {
+    padding: 0 12px;
+  }
+
+  .photo    { max-width: 260px; }
+  .name     { font-size: 40px; }
+
+  .typingBox {
+    width: 100%;
+    max-width: 280px;
+    height: 68px;
+  }
+
+  .typingText,
+  .cursor   { font-size: 42px; }
+
+  .headline { font-size: 40px; }
+
+  .sub      { font-size: 14px; }
 }

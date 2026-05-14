@@ -25,3 +25,33 @@
   width: auto;
   pointer-events: all;
 }
+
+/* ── tablet ── */
+@media (max-width: 768px) {
+  .left {
+    top: 20px;
+    left: 20px;
+    height: 40px;
+  }
+
+  .right {
+    top: 20px;
+    right: 20px;
+    height: 40px;
+  }
+}
+
+/* ── mobile ── */
+@media (max-width: 480px) {
+  .left {
+    top: 16px;
+    left: 14px;
+    height: 34px;
+  }
+
+  .right {
+    top: 16px;
+    right: 14px;
+    height: 34px;
+  }
+}
