@@ -1,0 +1,4 @@
+.wrapper {
+  /* clip doesn't create a scroll container, so position:sticky on hero still works */
+  overflow-x: clip;
+}

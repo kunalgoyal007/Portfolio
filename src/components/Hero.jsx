@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import styles from './Hero.module.css'
+import Navbar from './Navbar'
 
 const TYPING_WORDS = ['Designing', 'Building', 'Crafting']
 
@@ -29,6 +30,7 @@ export default function Hero() {
 
   return (
     <section className={styles.hero}>
+      <Navbar />
       {/* LEFT — photo */}
       <div className={styles.photoCol}>
         <img src="/images/KG.png" alt="Kunal Goyal" className={styles.photo} />

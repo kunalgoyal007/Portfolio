@@ -1,0 +1,224 @@
+/* ── Section wrapper — sits above sticky hero ── */
+.section {
+  position: relative;
+  z-index: 1;
+  background: #161616;
+  border-radius: 24px 24px 0 0;
+  /* overflow:hidden would break position:sticky on leftCol — use clip instead */
+  overflow-x: clip;
+}
+
+/* ── Marquee strip ── */
+.marqueeWrapper {
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 0;
+  background: #161616;
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.marqueeItem {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: 'Caveat', cursive;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #666;
+  padding: 0 4px;
+}
+
+.dot {
+  margin: 0 20px;
+  color: #3d3d3d;
+  font-size: 22px;
+  font-family: 'Caveat', cursive;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Main two-col layout ── */
+.content {
+  display: flex;
+  gap: 80px;
+  padding: 80px 80px 120px;
+  align-items: flex-start;
+}
+
+/* LEFT — flex:1 so it fills space; sticky stops when section ends */
+.leftCol {
+  flex: 1;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  padding-top: 8px;
+}
+
+.heading {
+  font-size: 52px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.75;
+  color: #666;
+  max-width: 300px;
+}
+
+/* RIGHT — card stack */
+.rightCol {
+  flex: 0 0 460px;
+  width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Card ── */
+.card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  background: #2a2a2a;
+  overflow: hidden;
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.03);
+}
+
+/* shown when image fails to load */
+.imagePlaceholder {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+  min-height: 160px;
+}
+
+.cardBody {
+  padding: 16px 20px 20px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 7px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #d8d8d8;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* ── Tablet ── */
+@media (max-width: 1100px) {
+  .content {
+    gap: 48px;
+    padding: 60px 48px 100px;
+  }
+
+  .heading {
+    font-size: 38px;
+    white-space: normal;
+  }
+
+  .rightCol {
+    flex: 0 0 360px;
+    width: 360px;
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .section {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .content {
+    flex-direction: column;
+    gap: 40px;
+    padding: 48px 24px 80px;
+  }
+
+  .leftCol {
+    flex: none;
+    position: static;
+  }
+
+  .heading {
+    font-size: 36px;
+  }
+
+  .description {
+    max-width: 100%;
+  }
+
+  .marqueeItem {
+    font-size: 12px;
+  }
+
+  .dot {
+    margin: 0 14px;
+  }
+
+  .cardTitle {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 36px 16px 60px;
+  }
+
+  .heading {
+    font-size: 30px;
+  }
+
+  .cardBody {
+    padding: 18px 20px 22px;
+  }
+}

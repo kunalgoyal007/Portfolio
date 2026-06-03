@@ -16,7 +16,6 @@ body {
   background-image: radial-gradient(circle, #3d3d3d 1px, transparent 1px);
   background-size: 28px 28px;
   color: #e0e0e0;
-  overflow-x: hidden;
 }
 
 #root {
