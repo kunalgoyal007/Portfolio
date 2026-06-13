@@ -21,7 +21,7 @@ const PROJECTS = [
   },
   {
     id: 4,
-    image: '/images/selectedimage3.jpg',
+    image: '/images/selectedimage4.jpg',
     title: 'Enterprise Dashboard Redesign — Simplifying Complex Workflows',
     tag: 'Enterprise UX',
   },
