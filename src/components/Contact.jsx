@@ -1,4 +1,6 @@
+import { motion } from 'framer-motion'
 import styles from './Contact.module.css'
+import { fadeUp, stagger, viewportOnce } from '../lib/motion'
 
 const LINKS = [
   { label: 'Email', href: 'mailto:kgoyal0302@gmail.com' },
@@ -11,16 +13,31 @@ const LINKS = [
 export default function Contact() {
   return (
     <section className={styles.section}>
-      <div className={styles.box}>
-        <h2 className={styles.heading}>Let's Work Together</h2>
+      <motion.div
+        className={styles.box}
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+      >
+        <motion.h2 className={styles.heading} variants={fadeUp}>
+          Let's Work Together
+        </motion.h2>
         <div className={styles.links}>
           {LINKS.map((link, i) => (
-            <a key={i} href={link.href} className={styles.link}>
+            <motion.a
+              key={i}
+              href={link.href}
+              className={styles.link}
+              variants={fadeUp}
+              whileHover={{ y: -3 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+            >
               {link.label}
-            </a>
+            </motion.a>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

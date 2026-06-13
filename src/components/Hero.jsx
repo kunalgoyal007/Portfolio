@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import styles from './Hero.module.css'
 import Navbar from './Navbar'
+import { fadeUp, stagger, EASE } from '../lib/motion'
 
 const TYPING_WORDS = ['Designing', 'Building', 'Crafting']
 
@@ -32,27 +34,39 @@ export default function Hero() {
     <section className={styles.hero}>
       <Navbar />
       {/* LEFT — photo */}
-      <div className={styles.photoCol}>
+      <motion.div
+        className={styles.photoCol}
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: EASE }}
+      >
         <img src="/images/KG.png" alt="Kunal Goyal" className={styles.photo} />
         <p className={styles.name}>Kunal Goyal</p>
-      </div>
+      </motion.div>
 
       {/* RIGHT — text */}
-      <div className={styles.textCol}>
-        <div className={styles.typingBox}>
+      <motion.div
+        className={styles.textCol}
+        variants={stagger}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.div className={styles.typingBox} variants={fadeUp}>
           <span className={styles.cornerTL} />
           <span className={styles.cornerTR} />
           <span className={styles.cornerBL} />
           <span className={styles.cornerBR} />
           <span className={styles.typingText}>{displayText}</span>
           <span className={styles.cursor}>|</span>
-        </div>
-        <h1 className={styles.headline}>the In-Between</h1>
-        <p className={styles.sub}>
+        </motion.div>
+        <motion.h1 className={styles.headline} variants={fadeUp}>
+          the In-Between
+        </motion.h1>
+        <motion.p className={styles.sub} variants={fadeUp}>
           I design products where structure does the heavy lifting and motion does
           the storytelling — from enterprise dashboards to AI-led experiences.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </section>
   )
 }

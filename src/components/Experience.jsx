@@ -1,4 +1,6 @@
+import { motion } from 'framer-motion'
 import styles from './Experience.module.css'
+import { fadeUp, stagger, viewportOnce } from '../lib/motion'
 
 const JOBS = [
   {
@@ -26,21 +28,29 @@ const JOBS = [
 export default function Experience() {
   return (
     <section className={styles.section}>
-      <div className={styles.inner}>
-        <h2 className={styles.heading}>Experience (2.5 years)</h2>
+      <motion.div
+        className={styles.inner}
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+      >
+        <motion.h2 className={styles.heading} variants={fadeUp}>
+          Experience (2.5 years)
+        </motion.h2>
 
         <div className={styles.list}>
           {JOBS.map((job, i) => (
-            <div key={i} className={styles.row}>
+            <motion.div key={i} className={styles.row} variants={fadeUp}>
               <span className={styles.company}>{job.company}</span>
               <div className={styles.meta}>
                 <span className={styles.role}>{job.role}</span>
                 <span className={styles.period}>{job.period}</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }
