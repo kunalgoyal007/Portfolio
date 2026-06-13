@@ -6,24 +6,28 @@ const PROJECTS = [
     image: '/images/selectedimage1.jpg',
     title: 'Where Personal Development Meets Organizational Innovation',
     tag: 'Product Design',
+    href: '/seletecdwork1.html',
   },
   {
     id: 2,
     image: '/images/selectedimage2.jpg',
     title: 'An Immersive Ecommerce Experience Inspired by Indian Artistry',
     tag: 'UX Design',
+    href: '/selectedwork2.html',
   },
   {
     id: 3,
     image: '/images/selectedimage3.jpg',
     title: 'Designing an Immersive Editorial Platform for Music Discovery & Storytelling',
     tag: 'UI Design',
+    href: '/selectedwork3.html',
   },
   {
     id: 4,
     image: '/images/selectedimage4.jpg',
     title: 'Enterprise Dashboard Redesign — Simplifying Complex Workflows',
     tag: 'Enterprise UX',
+    href: '/selectedwork4.html',
   },
 ]
 
@@ -67,25 +71,31 @@ export default function SelectedWork() {
 
         {/* RIGHT — cards */}
         <div className={styles.rightCol}>
-          {PROJECTS.map((project) => (
-            <div key={project.id} className={styles.card}>
-              <div className={styles.imageWrapper}>
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className={styles.image}
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                    e.currentTarget.parentElement.classList.add(styles.imagePlaceholder)
-                  }}
-                />
-              </div>
-              <div className={styles.cardBody}>
-                <span className={styles.tag}>{project.tag}</span>
-                <h3 className={styles.cardTitle}>{project.title}</h3>
-              </div>
-            </div>
-          ))}
+          {PROJECTS.map((project) => {
+            const CardTag = project.href ? 'a' : 'div'
+            const linkProps = project.href
+              ? { href: project.href, target: '_blank', rel: 'noopener noreferrer' }
+              : {}
+            return (
+              <CardTag key={project.id} className={styles.card} {...linkProps}>
+                <div className={styles.imageWrapper}>
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className={styles.image}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.parentElement.classList.add(styles.imagePlaceholder)
+                    }}
+                  />
+                </div>
+                <div className={styles.cardBody}>
+                  <span className={styles.tag}>{project.tag}</span>
+                  <h3 className={styles.cardTitle}>{project.title}</h3>
+                </div>
+              </CardTag>
+            )
+          })}
         </div>
       </div>
     </section>

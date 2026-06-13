@@ -1,0 +1,2661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SurpassIN — Enterprise Workforce & Career Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --void:    #03060F;
+  --base:    #060A18;
+  --surface: #0A1022;
+  --raised:  #101828;
+  --panel:   #151F30;
+  --panel-2: #1C2840;
+
+  /* Ink */
+  --ink:    #EBF0FF;
+  --ink-70: rgba(235,240,255,0.70);
+  --ink-45: rgba(235,240,255,0.45);
+  --ink-25: rgba(235,240,255,0.25);
+  --ink-10: rgba(235,240,255,0.10);
+  --ink-06: rgba(235,240,255,0.06);
+  --ink-03: rgba(235,240,255,0.03);
+
+  /* Accent — electric indigo */
+  --a:      #5468FF;
+  --a-70:   rgba(84,104,255,0.70);
+  --a-30:   rgba(84,104,255,0.30);
+  --a-15:   rgba(84,104,255,0.15);
+  --a-08:   rgba(84,104,255,0.08);
+
+  /* Violet secondary */
+  --v:      #8B5CF6;
+  --v-30:   rgba(139,92,246,0.30);
+
+  /* Amber accent (selective) */
+  --am:     #F59E0B;
+  --am-20:  rgba(245,158,11,0.20);
+
+  /* Status */
+  --green:  #10B981;
+  --red:    #EF4444;
+  --cyan:   #06B6D4;
+
+  /* Borders */
+  --line:   rgba(235,240,255,0.07);
+  --line-a: rgba(84,104,255,0.20);
+
+  /* Typography */
+  --f-display: 'Plus Jakarta Sans', sans-serif;
+  --f-serif:   'DM Serif Display', serif;
+
+  /* Spacing */
+  --max: 1360px;
+  --px:  72px;
+  --section-gap: 180px;
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--f-display);
+  background: var(--void);
+  color: var(--ink);
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--a); border-radius: 2px; }
+
+/* ─── GRID ATMOSPHERE ─── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--ink-03) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink-03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+}
+
+/* ─── GRAIN ─── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23f)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ─── READING PROGRESS ─── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 2px; z-index: 200;
+  background: linear-gradient(90deg, var(--a), var(--v));
+  width: 0%; transition: width 0.1s linear;
+}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 100; display: flex; align-items: center; gap: 40px;
+  padding: 0 28px; height: 52px;
+  background: rgba(6,10,24,0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(84,104,255,0.1);
+}
+.nav-logo {
+  font-size: 15px; font-weight: 800; letter-spacing: -0.5px;
+  color: var(--ink); white-space: nowrap;
+}
+.nav-logo em { font-style: normal; color: var(--a); }
+.nav-sep { width: 1px; height: 18px; background: var(--line); }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a {
+  font-size: 12.5px; font-weight: 500; color: var(--ink-45);
+  text-decoration: none; padding: 6px 12px; border-radius: 20px;
+  transition: color 0.2s, background 0.2s; letter-spacing: 0.1px;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--ink); background: var(--ink-06); }
+.nav-badge {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--a); padding: 4px 10px;
+  background: var(--a-08); border: 1px solid var(--a-15);
+  border-radius: var(--r-pill);
+}
+
+/* ═══════════════════════════════════════
+   LAYOUT PRIMITIVES
+═══════════════════════════════════════ */
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--px); position: relative; z-index: 2; }
+.section { position: relative; z-index: 1; }
+
+/* Section label system */
+.s-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--a); margin-bottom: 22px;
+}
+.s-label::before { content: ''; width: 24px; height: 1px; background: var(--a); }
+
+/* Giant watermark number */
+.s-num {
+  position: absolute; font-size: 280px; font-weight: 800;
+  color: var(--ink-03); line-height: 1; letter-spacing: -12px;
+  pointer-events: none; user-select: none; z-index: 0;
+}
+
+/* Section heading */
+.s-heading {
+  font-size: clamp(48px, 5.5vw, 78px);
+  font-weight: 800; letter-spacing: -3px; line-height: 1.0;
+  margin-bottom: 18px;
+}
+.s-heading em { font-style: italic; font-family: var(--f-serif); font-weight: 400; color: var(--ink-45); }
+.s-heading .hi { color: var(--a); }
+
+/* Accent text gradient */
+.grad {
+  background: linear-gradient(135deg, var(--a) 0%, var(--v) 55%, #06B6D4 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Horizontal rule */
+.h-rule { width: 100%; height: 1px; background: var(--line); margin: 0; }
+
+/* Section separator fancy */
+.sep {
+  display: flex; align-items: center; gap: 20px;
+  padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  margin: 100px 0;
+}
+.sep-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--a-70); text-transform: uppercase; }
+.sep-line { flex: 1; height: 1px; background: var(--line); }
+.sep-label { font-size: 11px; font-weight: 500; letter-spacing: 0.5px; color: var(--ink-25); }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1); }
+.reveal.up { opacity: 1; transform: translateY(0); }
+.d1 { transition-delay: 0.08s; }
+.d2 { transition-delay: 0.16s; }
+.d3 { transition-delay: 0.24s; }
+.d4 { transition-delay: 0.32s; }
+.d5 { transition-delay: 0.40s; }
+
+/* Card base */
+.card {
+  background: var(--raised); border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 32px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.card:hover { border-color: var(--line-a); transform: translateY(-3px); }
+.card::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(145deg, var(--ink-03), transparent 60%);
+  pointer-events: none;
+}
+
+/* Tag / chip */
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  padding: 4px 10px; border-radius: var(--r-pill);
+  border: 1px solid; white-space: nowrap;
+}
+.chip-blue { color: var(--a); border-color: var(--a-30); background: var(--a-08); }
+.chip-violet { color: #C4B5FD; border-color: var(--v-30); background: rgba(139,92,246,0.08); }
+.chip-amber { color: var(--am); border-color: var(--am-20); background: rgba(245,158,11,0.08); }
+.chip-green { color: var(--green); border-color: rgba(16,185,129,0.25); background: rgba(16,185,129,0.08); }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--f-display); font-size: 13.5px; font-weight: 600;
+  border-radius: var(--r-pill); padding: 12px 24px;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-solid {
+  background: var(--a); color: #fff;
+  box-shadow: 0 4px 20px rgba(84,104,255,0.35), 0 1px 0 rgba(255,255,255,0.1) inset;
+}
+.btn-solid:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(84,104,255,0.5); background: #6578FF; }
+.btn-outline {
+  background: transparent; color: var(--ink-70);
+  border: 1px solid var(--line);
+}
+.btn-outline:hover { border-color: var(--line-a); color: var(--ink); background: var(--ink-03); }
+
+/* ═══════════════════════════════════════
+   §0  HERO
+═══════════════════════════════════════ */
+#hero {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding-bottom: 0; overflow: hidden; position: relative;
+}
+
+/* Hero ambient lights */
+.hero-light {
+  position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none;
+}
+.hl-1 { width: 700px; height: 700px; top: -200px; left: -150px; background: radial-gradient(circle, rgba(84,104,255,0.14) 0%, transparent 70%); animation: hl 14s ease-in-out infinite; }
+.hl-2 { width: 600px; height: 600px; top: 100px; right: -100px; background: radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%); animation: hl 18s ease-in-out infinite reverse; }
+.hl-3 { width: 400px; height: 400px; bottom: 200px; left: 35%; background: radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%); animation: hl 22s ease-in-out infinite 4s; }
+@keyframes hl { 0%,100%{transform:translate(0,0);} 33%{transform:translate(40px,-30px);} 66%{transform:translate(-30px,20px);} }
+
+.hero-inner { padding: 140px var(--px) 0; max-width: var(--max); margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+
+/* Overline */
+.hero-overline {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 44px;
+}
+.hero-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--a); animation: hpulse 2.5s ease-in-out infinite; }
+@keyframes hpulse { 0%,100%{box-shadow:0 0 0 0 var(--a-30);} 50%{box-shadow:0 0 0 8px transparent;} }
+.hero-overline-text { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--a); }
+.hero-overline-divider { width: 1px; height: 14px; background: var(--line-a); }
+.hero-overline-sub { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--ink-45); text-transform: uppercase; }
+
+/* Main title */
+.hero-title {
+  font-size: clamp(64px, 8vw, 112px);
+  font-weight: 800; letter-spacing: -5px; line-height: 0.96;
+  margin-bottom: 36px; max-width: 900px;
+}
+.hero-title .serif-em {
+  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  letter-spacing: -2px; color: var(--ink-45);
+}
+
+.hero-body-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+  align-items: flex-end; margin-bottom: 48px;
+}
+.hero-desc {
+  font-size: 17px; font-weight: 400; color: var(--ink-70);
+  line-height: 1.75; max-width: 420px;
+}
+.hero-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.hero-meta-cell { padding: 18px 22px; background: var(--raised); }
+.hero-meta-cell:nth-child(1), .hero-meta-cell:nth-child(2) { border-bottom: 1px solid var(--line); }
+.hero-meta-cell:nth-child(1), .hero-meta-cell:nth-child(3) { border-right: 1px solid var(--line); }
+.hmc-label { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink-25); margin-bottom: 6px; }
+.hmc-value { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+.hero-actions { display: flex; gap: 12px; padding-bottom: 60px; }
+
+/* Hero browser mockup — full-width cinematic */
+.hero-mockup-stage {
+  position: relative; z-index: 2; width: 100%;
+  padding: 0 var(--px);
+  max-width: var(--max); margin: 0 auto;
+}
+.hero-browser {
+  width: 100%; border-radius: 16px 16px 0 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  box-shadow: 0 -20px 80px rgba(84,104,255,0.08), 0 -1px 0 rgba(255,255,255,0.06) inset;
+  overflow: hidden;
+  transform: perspective(1800px) rotateX(3deg);
+  transform-origin: bottom center;
+}
+.browser-bar {
+  height: 44px; background: var(--raised); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 18px; gap: 14px;
+}
+.browser-dots { display: flex; gap: 6px; }
+.b-dot { width: 10px; height: 10px; border-radius: 50%; }
+.b-dot:nth-child(1) { background: #FF5F57; }
+.b-dot:nth-child(2) { background: #FEBC2E; }
+.b-dot:nth-child(3) { background: #28C840; }
+.browser-url {
+  flex: 1; max-width: 360px; height: 26px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 6px;
+  margin: 0 auto; display: flex; align-items: center; padding: 0 10px; gap: 6px;
+}
+.url-lock { width: 10px; height: 12px; background: var(--ink-25); border-radius: 2px; }
+.url-text { font-size: 11px; color: var(--ink-45); font-weight: 500; }
+
+/* Dashboard inside browser */
+.db-wrap { display: flex; height: 460px; }
+.db-sidebar {
+  width: 220px; background: rgba(6,10,24,0.6); border-right: 1px solid var(--line);
+  padding: 20px 14px; flex-shrink: 0;
+}
+.db-logo-row { display: flex; align-items: center; gap: 9px; margin-bottom: 28px; padding: 0 6px; }
+.db-logo-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--a), var(--v)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+.db-logo-text { font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; }
+.db-nav-group { margin-bottom: 20px; }
+.db-nav-label { font-size: 9px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink-25); padding: 0 10px; margin-bottom: 6px; }
+.db-nav-item {
+  height: 34px; border-radius: 9px; display: flex; align-items: center;
+  padding: 0 10px; gap: 9px; margin-bottom: 2px; cursor: pointer;
+  transition: background 0.15s;
+}
+.db-nav-item:hover { background: var(--ink-06); }
+.db-nav-item.active { background: var(--a-15); }
+.db-nav-icon { width: 14px; height: 14px; border-radius: 3px; background: var(--ink-10); flex-shrink: 0; }
+.db-nav-item.active .db-nav-icon { background: var(--a); }
+.db-nav-text { font-size: 12.5px; font-weight: 500; color: var(--ink-45); flex: 1; }
+.db-nav-item.active .db-nav-text { color: var(--ink); font-weight: 600; }
+.db-nav-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--a-30); color: var(--a); }
+.db-sidebar-bottom { margin-top: auto; }
+
+.db-main { flex: 1; background: var(--base); display: flex; flex-direction: column; overflow: hidden; }
+.db-topbar {
+  height: 52px; border-bottom: 1px solid var(--line); display: flex;
+  align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; background: rgba(6,10,24,0.4);
+}
+.db-topbar-title { font-size: 15px; font-weight: 700; color: var(--ink); flex: 1; }
+.db-topbar-title span { color: var(--ink-45); font-weight: 400; font-size: 13px; margin-left: 8px; }
+.db-topbar-actions { display: flex; gap: 8px; }
+.db-tbtn { height: 30px; padding: 0 12px; border-radius: 7px; display: flex; align-items: center; font-size: 11.5px; font-weight: 600; cursor: pointer; }
+.db-tbtn-solid { background: var(--a); color: #fff; }
+.db-tbtn-ghost { background: var(--ink-06); color: var(--ink-45); border: 1px solid var(--line); }
+
+.db-content { flex: 1; padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; gap: 16px; }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.kpi { background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
+.kpi-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.kpi-label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.8px; color: var(--ink-45); margin-bottom: 10px; }
+.kpi-val { font-size: 24px; font-weight: 800; letter-spacing: -1px; color: var(--ink); margin-bottom: 6px; }
+.kpi-sub { font-size: 11px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.kpi-up { color: var(--green); }
+.kpi-down { color: var(--red); }
+.kpi-neutral { color: var(--ink-45); }
+
+/* Charts area */
+.charts-area { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; flex: 1; }
+.chart-card { background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; }
+.cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.cc-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.cc-sub { font-size: 10.5px; color: var(--ink-25); }
+.cc-period { font-size: 10.5px; color: var(--a); font-weight: 600; padding: 3px 8px; background: var(--a-08); border: 1px solid var(--a-15); border-radius: 5px; }
+
+/* SVG chart */
+.chart-svg { flex: 1; }
+
+/* Mini table */
+.mini-table { display: flex; flex-direction: column; gap: 0; }
+.mt-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.mt-row:last-child { border-bottom: none; }
+.mt-avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+.mt-name { font-size: 11.5px; font-weight: 500; color: var(--ink); flex: 1; }
+.mt-val { font-size: 11px; font-weight: 700; color: var(--ink-45); }
+.mt-badge { font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.mt-badge-g { background: rgba(16,185,129,0.12); color: var(--green); }
+.mt-badge-y { background: rgba(245,158,11,0.12); color: var(--am); }
+
+/* Donut */
+.donut-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.dl-item { display: flex; align-items: center; gap: 6px; }
+.dl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dl-label { font-size: 10.5px; color: var(--ink-45); }
+.dl-val { font-size: 11px; font-weight: 700; color: var(--ink); margin-left: 2px; }
+
+/* ═══════════════════════════════════════
+   §1  OVERVIEW
+═══════════════════════════════════════ */
+#overview { padding: var(--section-gap) 0 120px; }
+.overview-layout { display: grid; grid-template-columns: 5fr 7fr; gap: 100px; align-items: start; }
+.ov-left { position: sticky; top: 100px; }
+.ov-left .s-heading { font-size: clamp(42px, 4.5vw, 64px); }
+.ov-desc { font-size: 16px; color: var(--ink-70); line-height: 1.8; margin-bottom: 36px; }
+.ov-stat-row { display: flex; gap: 32px; padding-top: 36px; border-top: 1px solid var(--line); }
+.ov-stat-num { font-size: 36px; font-weight: 800; letter-spacing: -2px; background: var(--grad, var(--a)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.ov-stat-label { font-size: 11px; color: var(--ink-45); font-weight: 500; margin-top: 2px; }
+
+.ov-cards { display: flex; flex-direction: column; gap: 16px; }
+.ov-card { border-radius: var(--r-lg); overflow: hidden; }
+.ov-card-header {
+  background: var(--raised); border: 1px solid var(--line); border-bottom: none;
+  border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 18px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ov-card-body {
+  background: var(--panel); border: 1px solid var(--line); border-top: none;
+  border-radius: 0 0 var(--r-lg) var(--r-lg); padding: 20px 24px;
+}
+.ov-card-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.ov-card-body ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.ov-card-body li {
+  font-size: 13.5px; color: var(--ink-70); display: flex; align-items: baseline; gap: 10px;
+}
+.ov-card-body li::before { content: '—'; color: var(--a); font-size: 11px; flex-shrink: 0; }
+.tools-flex { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* ═══════════════════════════════════════
+   §2  PROBLEM
+═══════════════════════════════════════ */
+#problem { padding: var(--section-gap) 0; background: var(--base); position: relative; overflow: hidden; }
+#problem .bg-accent {
+  position: absolute; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px);
+  background: radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 70%);
+  top: -100px; right: -100px; pointer-events: none;
+}
+.problem-statement {
+  font-size: clamp(32px, 4vw, 56px); font-weight: 800; letter-spacing: -2.5px;
+  line-height: 1.08; max-width: 900px; margin-bottom: 80px;
+}
+.problem-statement .highlight {
+  background: linear-gradient(90deg, #EF4444, #F97316);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.pain-list { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 80px; }
+.pain-item {
+  display: grid; grid-template-columns: 80px 1fr 1fr; gap: 40px; align-items: start;
+  padding: 40px 0; border-bottom: 1px solid var(--line);
+  transition: background 0.2s;
+}
+.pain-item:last-child { border-bottom: none; }
+.pain-item:hover { background: var(--ink-03); margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+.pain-n { font-family: var(--f-display); font-size: 42px; font-weight: 800; letter-spacing: -2px; color: var(--ink-10); line-height: 1; }
+.pain-title { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); margin-bottom: 8px; }
+.pain-body { font-size: 14.5px; color: var(--ink-70); line-height: 1.7; }
+.pain-stat { font-size: 13px; color: var(--ink-45); font-weight: 500; margin-top: 12px; display: flex; align-items: center; gap: 6px; }
+.pain-stat::before { content: ''; width: 16px; height: 1px; background: var(--ink-25); }
+
+.goal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.goal-card {
+  background: var(--raised); border: 1px solid var(--line);
+  border-radius: var(--r-xl); padding: 36px 28px; position: relative; overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.goal-card:hover { border-color: var(--a-30); transform: translateY(-4px); }
+.goal-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, var(--a-08), transparent 60%);
+}
+.goal-icon-wrap {
+  width: 44px; height: 44px; border-radius: 12px; margin-bottom: 20px;
+  background: var(--a-15); border: 1px solid var(--a-30);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.goal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+.goal-body { font-size: 13.5px; color: var(--ink-70); line-height: 1.65; }
+
+/* ═══════════════════════════════════════
+   §3  RESEARCH
+═══════════════════════════════════════ */
+#research { padding: var(--section-gap) 0; }
+.research-top { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-bottom: 80px; }
+
+.big-insight-grid { display: flex; flex-direction: column; gap: 0; }
+.bi-item {
+  display: grid; grid-template-columns: 1fr 3fr; gap: 32px;
+  padding: 32px 0; border-bottom: 1px solid var(--line);
+  transition: padding 0.2s;
+}
+.bi-item:first-child { padding-top: 0; }
+.bi-item:last-child { border-bottom: none; }
+.bi-num {
+  font-size: 48px; font-weight: 800; letter-spacing: -3px;
+  background: var(--gradient-text, linear-gradient(135deg,var(--a),var(--v)));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  line-height: 1;
+}
+.bi-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.bi-body { font-size: 13.5px; color: var(--ink-70); line-height: 1.65; }
+
+.research-right { padding-top: 8px; }
+.r-desc { font-size: 16px; color: var(--ink-70); line-height: 1.8; margin-bottom: 32px; }
+.persona-strip { display: flex; flex-direction: column; gap: 10px; }
+.persona-row {
+  display: flex; align-items: center; gap: 14px; padding: 16px;
+  background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-md);
+  transition: border-color 0.2s;
+}
+.persona-row:hover { border-color: var(--line-a); }
+.pa-av {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--line-a);
+}
+.pa-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.pa-role { font-size: 11.5px; color: var(--ink-45); margin-top: 1px; }
+.pa-tags { display: flex; gap: 5px; margin-left: auto; }
+
+.r-stats-bar { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.r-stat {
+  padding: 28px 24px; background: var(--raised); text-align: center;
+  border-right: 1px solid var(--line);
+}
+.r-stat:last-child { border-right: none; }
+.r-stat-n { font-size: 42px; font-weight: 800; letter-spacing: -2.5px; line-height: 1; margin-bottom: 6px; }
+.r-stat-l { font-size: 11px; font-weight: 500; color: var(--ink-45); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ═══════════════════════════════════════
+   §4  USER FLOW
+═══════════════════════════════════════ */
+#userflow { padding: var(--section-gap) 0; background: var(--base); }
+
+.flow-container {
+  background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl);
+  padding: 48px; margin: 60px 0; position: relative; overflow: hidden;
+}
+.flow-container::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% -30%, var(--a-08), transparent 60%);
+}
+.flow-track { display: flex; align-items: center; gap: 0; position: relative; z-index: 1; }
+.flow-node { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 1; position: relative; }
+.flow-node:not(:last-child)::after {
+  content: ''; position: absolute; top: 22px; left: 50%; width: 100%;
+  height: 1px; background: linear-gradient(90deg, var(--a-30), var(--a-15));
+  z-index: 0;
+}
+.fn-dot {
+  width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--a-30);
+  background: var(--a-08); display: flex; align-items: center; justify-content: center;
+  font-size: 16px; position: relative; z-index: 1; margin-bottom: 14px;
+}
+.flow-node.active .fn-dot { background: var(--a); border-color: var(--a); box-shadow: 0 0 24px var(--a-30); }
+.fn-label { font-size: 12px; font-weight: 700; color: var(--ink); text-align: center; margin-bottom: 3px; }
+.fn-sub { font-size: 10.5px; color: var(--ink-45); text-align: center; }
+
+/* UX Timeline */
+.ux-timeline { margin-top: 60px; }
+.ux-tl-header { display: flex; justify-content: space-between; margin-bottom: 16px; }
+.ux-phase { flex: 1; text-align: center; position: relative; padding-top: 36px; }
+.ux-phase::before {
+  content: ''; position: absolute; top: 14px; left: -50%; right: 50%;
+  height: 1px; background: var(--line-a);
+}
+.ux-phase:first-child::before { display: none; }
+.ux-phase-dot {
+  position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--a), var(--v));
+  box-shadow: 0 0 16px var(--a-30);
+}
+.ux-phase-week { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-25); margin-bottom: 5px; }
+.ux-phase-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.ux-phase-desc { font-size: 11px; color: var(--ink-45); line-height: 1.5; }
+
+/* Wireframe grid */
+.wf-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 60px; }
+.wf-card { border-radius: var(--r-lg); overflow: hidden; }
+.wf-screen {
+  height: 170px; background: var(--surface); border: 1px solid var(--line);
+  border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 14px; position: relative; overflow: hidden;
+}
+.wf-label {
+  background: var(--raised); border: 1px solid var(--line);
+  border-top: none; border-radius: 0 0 var(--r-lg) var(--r-lg);
+  padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--ink-45);
+}
+/* Wireframe sketch lines */
+.wf-line { height: 6px; border-radius: 3px; background: var(--ink-10); margin-bottom: 6px; }
+.wf-block { height: 28px; background: var(--ink-06); border: 1px dashed var(--ink-10); border-radius: 7px; margin-bottom: 8px; }
+.wf-sm { height: 14px; background: var(--ink-06); border: 1px dashed var(--ink-06); border-radius: 5px; margin-bottom: 5px; }
+
+/* ═══════════════════════════════════════
+   §5  WEB APP
+═══════════════════════════════════════ */
+#webapp { padding: var(--section-gap) 0 0; }
+.webapp-header { margin-bottom: 70px; }
+.webapp-header-row { display: flex; justify-content: space-between; align-items: flex-end; }
+
+/* Full-width dashboard showcase */
+.webapp-full {
+  width: 100%; background: var(--surface);
+  border-radius: 20px 20px 0 0; border: 1px solid var(--line);
+  border-bottom: none; overflow: hidden;
+  box-shadow: 0 -30px 80px rgba(84,104,255,0.06), 0 -1px 0 rgba(255,255,255,0.04) inset;
+}
+.webapp-browser-bar {
+  height: 44px; background: var(--raised); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 18px; gap: 14px;
+}
+.webapp-nav-tabs { display: flex; gap: 2px; }
+.tab-item { font-size: 11.5px; font-weight: 500; color: var(--ink-45); padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+.tab-item.active { background: var(--ink-06); color: var(--ink); }
+
+.webapp-layout { display: flex; height: 520px; }
+.webapp-sb {
+  width: 200px; background: rgba(6,10,24,0.5); border-right: 1px solid var(--line);
+  padding: 18px 12px; display: flex; flex-direction: column; flex-shrink: 0;
+}
+.wsb-logo { font-size: 13.5px; font-weight: 800; color: var(--ink); margin-bottom: 24px; padding: 0 8px; letter-spacing: -0.3px; }
+.wsb-logo em { font-style: normal; color: var(--a); }
+.wsb-nav { margin-bottom: 6px; }
+.wsb-item {
+  height: 32px; display: flex; align-items: center; gap: 8px;
+  padding: 0 8px; border-radius: 8px; margin-bottom: 1px;
+}
+.wsb-item.active { background: var(--a-15); }
+.wsb-icon { width: 14px; height: 14px; border-radius: 3px; background: var(--ink-10); flex-shrink: 0; }
+.wsb-item.active .wsb-icon { background: var(--a-70); }
+.wsb-text { font-size: 12.5px; font-weight: 500; color: var(--ink-45); }
+.wsb-item.active .wsb-text { color: var(--ink); font-weight: 600; }
+.wsb-divider { height: 1px; background: var(--line); margin: 10px 0; }
+.wsb-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-25); padding: 0 8px; margin-bottom: 5px; }
+
+.webapp-body-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.wb-topbar {
+  height: 50px; border-bottom: 1px solid var(--line); display: flex; align-items: center;
+  padding: 0 24px; gap: 16px; background: rgba(6,10,24,0.3);
+}
+.wb-page-title { font-size: 14.5px; font-weight: 700; color: var(--ink); flex: 1; }
+.wb-topbar-right { display: flex; gap: 8px; align-items: center; }
+.wb-chip { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink-45); }
+.wb-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,var(--a),var(--v)); }
+
+.wb-content { flex: 1; padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+
+/* analytics page content */
+.analytics-kpis { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+.a-kpi { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 14px; position: relative; overflow: hidden; }
+.a-kpi-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; border-radius: 0 0 10px 10px; }
+.a-kpi-label { font-size: 10px; color: var(--ink-25); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+.a-kpi-val { font-size: 20px; font-weight: 800; letter-spacing: -1px; color: var(--ink); margin-bottom: 4px; }
+.a-kpi-change { font-size: 10.5px; font-weight: 600; }
+
+.analytics-charts { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; flex: 1; }
+.a-chart { background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 16px; overflow: hidden; }
+.a-chart-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+.a-chart-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.a-chart-filters { display: flex; gap: 4px; }
+.a-filter { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 5px; cursor: pointer; color: var(--ink-45); }
+.a-filter.active { background: var(--a-15); color: var(--a); }
+
+/* Table inside dashboard */
+.a-table { display: flex; flex-direction: column; gap: 0; height: 100%; overflow: hidden; }
+.a-table-header { display: grid; grid-template-columns: 1fr 80px 80px 80px; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.ath { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-25); }
+.a-table-row { display: grid; grid-template-columns: 1fr 80px 80px 80px; gap: 8px; padding: 9px 0; border-bottom: 1px solid rgba(235,240,255,0.03); align-items: center; }
+.atr-name { font-size: 12px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+.atr-av { width: 20px; height: 20px; border-radius: 50%; }
+.atr-val { font-size: 11.5px; color: var(--ink-45); font-weight: 600; }
+.atr-badge { font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; width: fit-content; }
+.atr-badge-g { background: rgba(16,185,129,0.12); color: var(--green); }
+.atr-badge-y { background: rgba(245,158,11,0.12); color: var(--am); }
+.atr-badge-b { background: var(--a-08); color: var(--a); }
+
+/* Screen trio */
+.screen-trio { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; padding: 60px 0 0; }
+.st-card { background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: default; }
+.st-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px var(--line-a); }
+.st-screen { height: 220px; background: var(--base); position: relative; overflow: hidden; padding: 16px; }
+.st-screen::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(180deg,transparent,var(--raised)); }
+.st-info { padding: 18px 22px; border-top: 1px solid var(--line); }
+.st-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.st-sub { font-size: 12px; color: var(--ink-45); }
+
+/* ═══════════════════════════════════════
+   §6  MOBILE SHOWCASE
+═══════════════════════════════════════ */
+#mobile {
+  padding: var(--section-gap) 0;
+  background: var(--base);
+}
+.mobile-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; margin-bottom: 80px; }
+.mobile-desc { font-size: 16px; color: var(--ink-70); line-height: 1.8; }
+
+/* Phone composition */
+.phones-composition { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: 20px; height: 640px; margin-bottom: 60px; }
+
+.phone {
+  position: relative; flex-shrink: 0;
+  border-radius: 38px; overflow: hidden;
+  background: var(--surface);
+  border: 1.5px solid rgba(255,255,255,0.10);
+}
+.phone-sm { width: 170px; aspect-ratio: 9/19.5; }
+.phone-md { width: 200px; aspect-ratio: 9/19.5; }
+.phone-lg { width: 220px; aspect-ratio: 9/19.5; }
+.phone-notch {
+  position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+  width: 62px; height: 8px; background: var(--void); border-radius: 4px; z-index: 5;
+}
+
+.phone-inner { position: absolute; inset: 0; display: flex; flex-direction: column; }
+
+.p-1 { align-self: flex-end; margin-bottom: 80px; transform: rotate(5deg); box-shadow: 0 30px 80px rgba(0,0,0,0.5); animation: pf1 7s ease-in-out infinite; }
+.p-2 { align-self: flex-start; margin-bottom: 20px; box-shadow: 0 40px 100px rgba(84,104,255,0.2), 0 0 0 1px rgba(84,104,255,0.15); animation: pf2 8s ease-in-out infinite 0.5s; z-index: 2; }
+.p-3 { align-self: flex-end; margin-bottom: 100px; transform: rotate(-4deg); box-shadow: 0 25px 60px rgba(0,0,0,0.4); animation: pf3 9s ease-in-out infinite 1s; }
+.p-4 { align-self: center; margin-bottom: 40px; transform: rotate(3deg); box-shadow: 0 20px 50px rgba(0,0,0,0.35); animation: pf4 6s ease-in-out infinite 2s; }
+
+@keyframes pf1 { 0%,100%{transform:rotate(5deg) translateY(0);} 50%{transform:rotate(5deg) translateY(-14px);} }
+@keyframes pf2 { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);} }
+@keyframes pf3 { 0%,100%{transform:rotate(-4deg) translateY(0);} 50%{transform:rotate(-4deg) translateY(-10px);} }
+@keyframes pf4 { 0%,100%{transform:rotate(3deg) translateY(0);} 50%{transform:rotate(3deg) translateY(-8px);} }
+
+/* Phone screen contents */
+.psc-header { height: 80px; padding: 28px 14px 8px; }
+.psc-greet { font-size: 9px; color: var(--ink-45); font-weight: 500; }
+.psc-name { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; }
+.psc-body { padding: 0 12px; flex: 1; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
+.psc-hero-card {
+  background: linear-gradient(135deg, rgba(84,104,255,0.25), rgba(139,92,246,0.18));
+  border: 1px solid rgba(84,104,255,0.25); border-radius: 16px; padding: 14px;
+}
+.phc-label { font-size: 8px; color: rgba(235,240,255,0.5); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+.phc-num { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -1.5px; line-height: 1; margin-bottom: 3px; }
+.phc-sub { font-size: 8.5px; color: var(--a); font-weight: 600; }
+.psc-prog-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+.ppr { background: var(--raised); border: 1px solid var(--line); border-radius: 9px; padding: 8px; }
+.ppr-label { font-size: 7px; color: var(--ink-45); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.ppr-bar { height: 3px; background: var(--ink-06); border-radius: 2px; overflow: hidden; }
+.ppr-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--a), var(--v)); }
+.psc-habits { display: flex; flex-direction: column; gap: 4px; }
+.ph-item { display: flex; align-items: center; gap: 7px; padding: 7px 10px; background: var(--raised); border: 1px solid var(--line); border-radius: 9px; }
+.ph-check { width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid var(--ink-25); flex-shrink: 0; }
+.ph-check.done { background: var(--a); border-color: var(--a); }
+.ph-text { font-size: 8.5px; font-weight: 500; color: var(--ink-70); flex: 1; }
+.ph-streak { font-size: 8.5px; color: var(--a); font-weight: 700; }
+
+/* Goals screen */
+.psg-body { padding: 0 12px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.goal-pill {
+  border-radius: 13px; padding: 12px; border: 1px solid;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.gp-cat { font-size: 7.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.gp-title { font-size: 11px; font-weight: 700; color: var(--ink); }
+.gp-prog { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.gp-fill { height: 100%; border-radius: 2px; }
+.gp-meta { font-size: 8px; color: var(--ink-45); display: flex; justify-content: space-between; }
+
+/* Vision board screen */
+.pvb-body { padding: 0 12px; flex: 1; overflow: hidden; }
+.pvb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; height: 100%; }
+.pvb-cell { border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.pvb-cell:first-child { grid-row: span 2; }
+
+/* DISC screen */
+.disc-body { padding: 0 12px; flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+.disc-archetype { background: linear-gradient(135deg,rgba(84,104,255,0.2),rgba(139,92,246,0.15)); border: 1px solid rgba(84,104,255,0.2); border-radius: 12px; padding: 12px; }
+.da-tag { font-size: 7.5px; letter-spacing: 1px; text-transform: uppercase; color: rgba(235,240,255,0.4); margin-bottom: 3px; }
+.da-title { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); }
+.da-sub { font-size: 8px; color: rgba(235,240,255,0.4); }
+.disc-bars { display: flex; gap: 5px; align-items: flex-end; height: 64px; }
+.disc-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+.disc-bar-fill { width: 100%; border-radius: 4px 4px 0 0; }
+.disc-bar-lbl { font-size: 8px; font-weight: 800; }
+
+/* Feature badges */
+.mobile-features { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.mf { background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 28px 22px; text-align: center; transition: border-color 0.25s, transform 0.25s; }
+.mf:hover { border-color: var(--line-a); transform: translateY(-4px); }
+.mf-icon { font-size: 26px; margin-bottom: 14px; }
+.mf-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.2px; }
+.mf-body { font-size: 13px; color: var(--ink-45); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   §7  ADMIN DASHBOARD
+═══════════════════════════════════════ */
+#admin { padding: var(--section-gap) 0; }
+
+.admin-canvas {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-xl); overflow: hidden; margin-top: 60px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+}
+.admin-appbar {
+  height: 52px; background: var(--raised); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 20px; gap: 16px;
+}
+.aab-logo { font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; margin-right: 4px; }
+.aab-search { flex: 1; max-width: 280px; height: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 7px; display: flex; align-items: center; padding: 0 10px; gap: 6px; }
+.aab-search-icon { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--ink-25); }
+.aab-search-line { flex: 1; height: 5px; background: var(--ink-10); border-radius: 2px; }
+.aab-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+.aab-btn { width: 28px; height: 28px; border-radius: 7px; background: var(--ink-06); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.aab-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--a),var(--v)); }
+
+.admin-body { display: flex; height: 520px; }
+.admin-left-rail {
+  width: 56px; background: rgba(3,6,15,0.5); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px;
+}
+.rail-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--ink-06); display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
+.rail-icon.active { background: var(--a-15); }
+.admin-sidebar {
+  width: 196px; border-right: 1px solid var(--line); padding: 14px 10px;
+  display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex-shrink: 0;
+}
+.asb-section { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-25); padding: 6px 8px 4px; margin-top: 8px; }
+.asb-item { height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 8px; border-radius: 8px; cursor: pointer; }
+.asb-item.active { background: var(--a-08); }
+.asb-icon { width: 14px; height: 14px; border-radius: 3px; background: var(--ink-10); flex-shrink: 0; }
+.asb-item.active .asb-icon { background: var(--a-70); }
+.asb-text { font-size: 12.5px; font-weight: 500; color: var(--ink-45); flex: 1; }
+.asb-item.active .asb-text { color: var(--ink); font-weight: 600; }
+.asb-count { font-size: 10px; font-weight: 700; background: var(--a-15); color: var(--a); padding: 1px 6px; border-radius: 5px; }
+.admin-divider { height: 1px; background: var(--line); margin: 4px 0; }
+
+.admin-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.admin-breadcrumb {
+  height: 46px; border-bottom: 1px solid var(--line); display: flex; align-items: center;
+  padding: 0 22px; gap: 8px; background: rgba(6,10,24,0.3);
+}
+.ab-crumb { font-size: 12px; color: var(--ink-45); }
+.ab-crumb.active { color: var(--ink); font-weight: 600; }
+.ab-sep { font-size: 12px; color: var(--ink-25); }
+.ab-actions { display: flex; gap: 7px; margin-left: auto; }
+.ab-btn { height: 28px; padding: 0 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600; display: flex; align-items: center; }
+.ab-btn-solid { background: var(--a); color: #fff; }
+.ab-btn-ghost { background: var(--ink-06); border: 1px solid var(--line); color: var(--ink-45); }
+
+.admin-body-content { flex: 1; padding: 18px 22px; overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
+
+/* Admin KPIs */
+.adm-kpis { display: grid; grid-template-columns: repeat(5,1fr); gap: 9px; }
+.adm-kpi { background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 12px; position: relative; overflow: hidden; }
+.adm-kpi-strip { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+.adm-kpi-label { font-size: 9.5px; color: var(--ink-25); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 7px; }
+.adm-kpi-val { font-size: 20px; font-weight: 800; letter-spacing: -1px; color: var(--ink); margin-bottom: 3px; }
+.adm-kpi-change { font-size: 10px; font-weight: 600; }
+
+/* Admin main area */
+.adm-main { display: grid; grid-template-columns: 2fr 1fr; gap: 11px; flex: 1; overflow: hidden; }
+.adm-chart { background: var(--raised); border: 1px solid var(--line); border-radius: 11px; padding: 14px; display: flex; flex-direction: column; overflow: hidden; }
+.adm-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.adm-chart-title { font-size: 12px; font-weight: 700; color: var(--ink); }
+.adm-legend { display: flex; gap: 10px; }
+.adm-leg-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.adm-leg-label { font-size: 10px; color: var(--ink-45); }
+
+/* Table */
+.adm-table { flex: 1; overflow: hidden; }
+.adm-table-head { display: grid; grid-template-columns: 1.5fr 1fr 1fr 80px 60px; gap: 8px; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 9px 9px 0 0; border-bottom: none; }
+.admt-header { font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-25); }
+.adm-table-rows { border: 1px solid var(--line); border-top: none; border-radius: 0 0 9px 9px; overflow: hidden; }
+.adm-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 80px 60px; gap: 8px; padding: 9px 12px; border-bottom: 1px solid rgba(235,240,255,0.03); align-items: center; }
+.adm-row:last-child { border-bottom: none; }
+.adm-cell { font-size: 12px; color: var(--ink-70); }
+.adm-cell-name { display: flex; align-items: center; gap: 8px; }
+.adm-av { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
+.adm-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.adm-email { font-size: 10px; color: var(--ink-45); }
+.adm-status { display: flex; }
+
+/* Admin features */
+.admin-features { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 60px; }
+.af-card { background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 28px 22px; transition: border-color 0.25s, transform 0.25s; }
+.af-card:hover { border-color: var(--line-a); transform: translateY(-4px); }
+.af-num { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--a-70); text-transform: uppercase; margin-bottom: 14px; }
+.af-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.af-body { font-size: 13px; color: var(--ink-45); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   §8  DESIGN SYSTEM
+═══════════════════════════════════════ */
+#designsystem { padding: var(--section-gap) 0; background: var(--base); }
+
+.ds-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; margin-bottom: 80px; }
+.ds-tagline { font-size: clamp(28px, 3vw, 42px); font-weight: 400; color: var(--ink-45); font-family: var(--f-serif); font-style: italic; line-height: 1.3; margin-top: 20px; }
+
+/* Design system grid */
+.ds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ds-panel {
+  background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl);
+  padding: 36px 32px; position: relative; overflow: hidden;
+}
+.ds-panel-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--a); margin-bottom: 28px; display: flex; align-items: center; gap: 10px; }
+.ds-panel-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* Colors showcase */
+.color-swatches { display: flex; gap: 8px; }
+.c-swatch { flex: 1; border-radius: 10px; overflow: hidden; }
+.cs-block { height: 56px; }
+.cs-info { padding: 8px; background: var(--panel); }
+.cs-name { font-size: 10px; font-weight: 600; color: var(--ink-45); }
+.cs-hex { font-size: 9px; color: var(--ink-25); margin-top: 2px; font-family: monospace; }
+
+.color-utility-row { display: flex; gap: 8px; margin-top: 10px; }
+.cu-item { flex: 1; border-radius: 8px; overflow: hidden; }
+.cu-block { height: 36px; }
+.cu-label { font-size: 9px; font-weight: 600; color: var(--ink-25); padding: 5px 8px; background: var(--panel); }
+
+/* Typography showcase */
+.type-samples { display: flex; flex-direction: column; gap: 20px; }
+.ts { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.ts:last-child { border-bottom: none; padding-bottom: 0; }
+.ts-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-25); margin-bottom: 6px; }
+.ts-display { font-size: 44px; font-weight: 800; letter-spacing: -2px; line-height: 1; background: linear-gradient(135deg,var(--ink) 0%,var(--a) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.ts-h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; color: var(--ink); }
+.ts-h3 { font-size: 18px; font-weight: 600; color: var(--ink); }
+.ts-body { font-size: 15px; color: var(--ink-70); line-height: 1.7; }
+.ts-caption { font-size: 11.5px; color: var(--ink-45); letter-spacing: 0.3px; }
+.ts-serif { font-family: var(--f-serif); font-style: italic; font-size: 28px; color: var(--ink-45); letter-spacing: -0.5px; }
+
+/* Components showcase */
+.comp-showcase { display: flex; flex-direction: column; gap: 14px; }
+.cs-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ds-btn-showcase { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; font-family: var(--f-display); cursor: pointer; }
+.dsb-solid { background: var(--a); color: #fff; border: none; }
+.dsb-outline { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.dsb-ghost { background: var(--ink-06); color: var(--ink-70); border: 1px solid var(--line); }
+.dsb-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.dsb-sm { padding: 6px 12px; font-size: 11.5px; }
+.dsb-icon { width: 34px; height: 34px; border-radius: 9px; border: none; display: flex; align-items: center; justify-content: center; }
+
+.ds-input { width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; font-size: 13.5px; color: var(--ink-70); font-family: var(--f-display); outline: none; }
+.ds-input:focus { border-color: var(--a-30); box-shadow: 0 0 0 3px var(--a-08); }
+
+.ds-card-sample { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+.toggle-track { width: 38px; height: 21px; border-radius: 11px; background: var(--a); position: relative; cursor: pointer; }
+.toggle-thumb { position: absolute; top: 3px; right: 3px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+
+/* Spacing system */
+.spacing-system { display: flex; flex-direction: column; gap: 10px; }
+.sp-row { display: flex; align-items: center; gap: 14px; }
+.sp-box { background: linear-gradient(135deg,var(--a-30),var(--v-30)); border-radius: 3px; flex-shrink: 0; }
+.sp-info { font-size: 12px; color: var(--ink-70); }
+.sp-token { font-family: monospace; font-size: 11px; color: var(--a-70); margin-left: 6px; }
+
+/* ═══════════════════════════════════════
+   §9  FINAL SHOWCASE
+═══════════════════════════════════════ */
+#showcase { padding: var(--section-gap) 0 0; position: relative; overflow: hidden; }
+#showcase .bg-glow {
+  position: absolute; width: 800px; height: 800px; border-radius: 50%;
+  filter: blur(150px); pointer-events: none;
+  background: radial-gradient(circle, rgba(84,104,255,0.1) 0%, transparent 70%);
+  top: 0; left: 50%; transform: translateX(-50%);
+}
+
+.showcase-title-full { text-align: center; margin-bottom: 80px; position: relative; z-index: 2; }
+.showcase-title-full .s-heading { font-size: clamp(52px, 7vw, 100px); letter-spacing: -5px; }
+
+/* Cinematic three-panel */
+.three-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; position: relative; z-index: 2; }
+.tp-panel {
+  background: var(--raised); border: 1px solid var(--line); overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.tp-panel:first-child { border-radius: var(--r-xl) 0 0 var(--r-xl); }
+.tp-panel:last-child { border-radius: 0 var(--r-xl) var(--r-xl) 0; }
+.tp-panel:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.tp-screen { height: 320px; position: relative; overflow: hidden; }
+.tp-label { padding: 20px 24px; border-top: 1px solid var(--line); background: var(--surface); }
+.tp-label-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--a); margin-bottom: 5px; }
+.tp-label-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.tp-label-sub { font-size: 12px; color: var(--ink-45); }
+
+/* Floating metric cards */
+.metric-float { position: absolute; z-index: 20; }
+.mf-card {
+  background: rgba(10,16,34,0.88); backdrop-filter: blur(24px);
+  border: 1px solid rgba(84,104,255,0.2); border-radius: var(--r-lg);
+  padding: 16px 20px; min-width: 160px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  animation: mfc 6s ease-in-out infinite;
+}
+.mf-card-2 { animation-duration: 8s; animation-delay: 1s; }
+.mf-card-3 { animation-duration: 7s; animation-delay: 2s; }
+@keyframes mfc { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+.mfc-label { font-size: 10px; color: var(--ink-45); font-weight: 500; margin-bottom: 4px; }
+.mfc-val { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+.mfc-spark { display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+.mfc-spark-bar { flex: 1; border-radius: 2px; }
+.mfc-tag { font-size: 10px; font-weight: 600; color: var(--green); display: flex; align-items: center; gap: 3px; }
+
+/* ═══════════════════════════════════════
+   §10  OUTCOME
+═══════════════════════════════════════ */
+#outcome { padding: var(--section-gap) 0; background: var(--base); }
+
+.outcome-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.outcome-metrics { margin-top: 48px; display: flex; flex-direction: column; gap: 20px; }
+.om-row { }
+.om-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.om-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.om-val { font-size: 13px; font-weight: 700; color: var(--a); }
+.om-track { height: 6px; background: var(--ink-06); border-radius: 3px; overflow: hidden; position: relative; }
+.om-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--a),var(--v)); transform: scaleX(0); transform-origin: left; transition: transform 1.2s cubic-bezier(0.22,1,0.36,1); }
+.om-fill.animated { transform: scaleX(1); }
+
+.learnings { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.learning {
+  display: grid; grid-template-columns: 48px 1fr; gap: 20px;
+  padding: 28px 0; border-bottom: 1px solid var(--line); align-items: start;
+}
+.learning:last-child { border-bottom: none; }
+.l-num { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--a-70); padding-top: 4px; }
+.l-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; color: var(--ink); margin-bottom: 7px; }
+.l-body { font-size: 14px; color: var(--ink-70); line-height: 1.7; }
+
+.scalability-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 60px; }
+.sc-card { padding: 28px; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-xl); transition: border-color 0.2s; }
+.sc-card:hover { border-color: var(--line-a); }
+.sc-icon { font-size: 22px; margin-bottom: 14px; }
+.sc-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.sc-body { font-size: 13px; color: var(--ink-45); line-height: 1.6; }
+
+/* ═══════════════════════════════════════
+   §11  CLOSING
+═══════════════════════════════════════ */
+#closing {
+  padding: 160px 0 0; text-align: center; position: relative; overflow: hidden;
+  background: linear-gradient(180deg, var(--base) 0%, var(--void) 40%);
+}
+.closing-glow {
+  position: absolute; width: 900px; height: 900px; border-radius: 50%; filter: blur(140px);
+  background: radial-gradient(circle, rgba(84,104,255,0.12) 0%, rgba(139,92,246,0.06) 40%, transparent 70%);
+  top: 0; left: 50%; transform: translateX(-50%); pointer-events: none;
+}
+.closing-inner { position: relative; z-index: 2; }
+.closing-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--a); margin-bottom: 28px; }
+.closing-title {
+  font-size: clamp(64px, 9vw, 128px); font-weight: 800; letter-spacing: -6px; line-height: 0.95;
+  margin-bottom: 28px;
+}
+.closing-title .serif { font-family: var(--f-serif); font-style: italic; font-weight: 400; color: var(--ink-45); }
+.closing-sub { font-size: 18px; color: var(--ink-45); max-width: 460px; margin: 0 auto 52px; line-height: 1.7; font-weight: 400; }
+.closing-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 100px; }
+
+/* Final browser */
+.closing-browser {
+  max-width: 1100px; margin: 0 auto;
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  border: 1px solid var(--line); border-bottom: none; overflow: hidden;
+  box-shadow: 0 -40px 120px rgba(84,104,255,0.08);
+  transform: perspective(2000px) rotateX(4deg);
+  transform-origin: bottom center;
+}
+.cb-bar { height: 44px; background: var(--raised); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 18px; gap: 14px; }
+.cb-screen { height: 400px; background: var(--base); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.cb-center { text-align: center; position: relative; z-index: 2; }
+.cb-brand { font-size: 56px; font-weight: 800; letter-spacing: -3px; background: linear-gradient(135deg,var(--ink),var(--a),var(--v)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+.cb-tagline { font-size: 16px; color: var(--ink-45); }
+.cb-chips { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+.cb-bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer {
+  padding: 32px var(--px); border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--void);
+}
+.footer-left { font-size: 12.5px; color: var(--ink-45); }
+.footer-left strong { color: var(--a); font-weight: 700; }
+.footer-right { display: flex; gap: 6px; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root { --px: 36px; --section-gap: 120px; }
+  .overview-layout, .research-top, .mobile-header-grid, .outcome-layout, .ds-intro { grid-template-columns: 1fr; gap: 48px; }
+  .ov-left { position: static; }
+  .hero-body-row { grid-template-columns: 1fr; }
+  .hero-title { letter-spacing: -3px; }
+  .pain-item { grid-template-columns: 60px 1fr; }
+  .pain-body { display: none; }
+  .three-panel { grid-template-columns: 1fr; }
+  .tp-panel:first-child, .tp-panel:last-child { border-radius: var(--r-xl); }
+  .phones-composition { height: 400px; }
+  .phone-sm, .phone-md { display: none; }
+  .adm-kpis { grid-template-columns: repeat(3,1fr); }
+  nav { top: 12px; }
+}
+@media (max-width: 768px) {
+  :root { --px: 20px; }
+  .nav-links { display: none; }
+  .goal-grid, .screen-trio, .mobile-features, .admin-features, .ds-grid, .scalability-grid { grid-template-columns: 1fr; }
+  .kpi-row, .analytics-kpis { grid-template-columns: 1fr 1fr; }
+  .wf-grid { grid-template-columns: 1fr 1fr; }
+  .r-stats-bar { grid-template-columns: 1fr; }
+  .three-panel { grid-template-columns: 1fr; gap: 12px; }
+}
+</style>
+</head>
+
+<body>
+<div id="progress-bar"></div>
+
+<!-- ═══════════════════════════════════════
+  NAV
+═══════════════════════════════════════ -->
+<nav>
+  <span class="nav-logo">Surpass<em>IN</em></span>
+  <div class="nav-sep"></div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#problem">Problem</a>
+    <a href="#webapp">Web App</a>
+    <a href="#mobile">Mobile</a>
+    <a href="#admin">Admin</a>
+    <a href="#outcome">Impact</a>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-badge">Case Study 2025</div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+  §0  HERO
+═══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-light hl-1"></div>
+  <div class="hero-light hl-2"></div>
+  <div class="hero-light hl-3"></div>
+
+  <div class="hero-inner">
+    <div class="hero-overline">
+      <div class="hero-dot"></div>
+      <span class="hero-overline-text">Enterprise Workforce Platform</span>
+      <div class="hero-overline-divider"></div>
+      <span class="hero-overline-sub">UX · Product Design · Design System</span>
+    </div>
+
+    <h1 class="hero-title reveal">
+      Surpass<span class="grad">IN</span><br>
+      <span class="serif-em">Career Ecosystem</span>
+    </h1>
+
+    <div class="hero-body-row reveal d1">
+      <p class="hero-desc">A unified enterprise ecosystem spanning mobile, web dashboard, and admin panel — engineered to transform how organizations track, develop, and elevate their workforce through behavioral intelligence.</p>
+      <div class="hero-meta-grid">
+        <div class="hero-meta-cell">
+          <div class="hmc-label">Project Type</div>
+          <div class="hmc-value">Enterprise SaaS Platform</div>
+        </div>
+        <div class="hero-meta-cell">
+          <div class="hmc-label">My Role</div>
+          <div class="hmc-value">Lead Product Designer</div>
+        </div>
+        <div class="hero-meta-cell">
+          <div class="hmc-label">Platforms</div>
+          <div class="hmc-value">Mobile · Web · Admin</div>
+        </div>
+        <div class="hero-meta-cell">
+          <div class="hmc-label">Timeline</div>
+          <div class="hmc-value">8 Months · 2024–25</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-actions reveal d2">
+      <a href="#overview" class="btn btn-solid">Explore the Case Study</a>
+      <a href="#outcome" class="btn btn-outline">View Impact Metrics →</a>
+    </div>
+  </div>
+
+  <!-- Cinematic browser mockup -->
+  <div class="hero-mockup-stage reveal d3">
+    <div class="hero-browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div>
+        </div>
+        <div class="browser-url">
+          <div class="url-lock"></div>
+          <span class="url-text">app.surpassin.io/dashboard</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <div style="width:22px;height:22px;border-radius:5px;background:var(--ink-06)"></div>
+          <div style="width:22px;height:22px;border-radius:5px;background:var(--ink-06)"></div>
+        </div>
+      </div>
+
+      <div class="db-wrap">
+        <!-- Sidebar -->
+        <div class="db-sidebar">
+          <div class="db-logo-row">
+            <div class="db-logo-mark">S</div>
+            <span class="db-logo-text">SurpassIN</span>
+          </div>
+          <div class="db-nav-group">
+            <div class="db-nav-label">Workspace</div>
+            <div class="db-nav-item active"><div class="db-nav-icon"></div><span class="db-nav-text">Dashboard</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Goals</span><span class="db-nav-badge">3</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Habits</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Journal</span></div>
+          </div>
+          <div class="db-nav-group">
+            <div class="db-nav-label">Analytics</div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Progress</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Reports</span></div>
+          </div>
+          <div class="db-nav-group">
+            <div class="db-nav-label">Growth</div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">DISC Profile</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Vision Board</span></div>
+            <div class="db-nav-item"><div class="db-nav-icon"></div><span class="db-nav-text">Coach</span></div>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="db-main">
+          <div class="db-topbar">
+            <span class="db-topbar-title">Dashboard <span>Good morning, Marcus —</span></span>
+            <div class="db-topbar-actions">
+              <div class="db-tbtn db-tbtn-ghost">Filter</div>
+              <div class="db-tbtn db-tbtn-ghost">Export</div>
+              <div class="db-tbtn db-tbtn-solid">+ New Goal</div>
+            </div>
+          </div>
+
+          <div class="db-content">
+            <!-- KPIs -->
+            <div class="kpi-row">
+              <div class="kpi">
+                <div class="kpi-accent" style="background:linear-gradient(90deg,#5468FF,#8B5CF6)"></div>
+                <div class="kpi-label">GOAL COMPLETION</div>
+                <div class="kpi-val">78%</div>
+                <div class="kpi-sub kpi-up">↑ 12% vs last month</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-accent" style="background:linear-gradient(90deg,#10B981,#06B6D4)"></div>
+                <div class="kpi-label">HABIT STREAK</div>
+                <div class="kpi-val">24 days</div>
+                <div class="kpi-sub kpi-up">↑ Personal best</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-accent" style="background:linear-gradient(90deg,#F59E0B,#EF4444)"></div>
+                <div class="kpi-label">WEEKLY SCORE</div>
+                <div class="kpi-val">847 pts</div>
+                <div class="kpi-sub kpi-up">↑ Top 8% cohort</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-accent" style="background:linear-gradient(90deg,#8B5CF6,#5468FF)"></div>
+                <div class="kpi-label">DISC PROFILE</div>
+                <div class="kpi-val">D-Type</div>
+                <div class="kpi-sub kpi-neutral">Driver · Decisive</div>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-area">
+              <!-- Main area chart -->
+              <div class="chart-card">
+                <div class="cc-header">
+                  <div>
+                    <div class="cc-title">Performance Trajectory</div>
+                    <div class="cc-sub">Goal · Habit · Score indices</div>
+                  </div>
+                  <div class="cc-period">Last 30 days</div>
+                </div>
+                <svg class="chart-svg" viewBox="0 0 400 100" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(84,104,255,0.25)"/>
+                      <stop offset="100%" stop-color="rgba(84,104,255,0)"/>
+                    </linearGradient>
+                    <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(16,185,129,0.15)"/>
+                      <stop offset="100%" stop-color="rgba(16,185,129,0)"/>
+                    </linearGradient>
+                    <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#5468FF"/><stop offset="100%" stop-color="#8B5CF6"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- Area 1 -->
+                  <path d="M0,70 C40,65 70,45 110,40 C150,35 180,20 220,18 C260,16 290,30 330,24 C370,18 390,10 400,6 L400,100 L0,100 Z" fill="url(#ag1)"/>
+                  <!-- Area 2 -->
+                  <path d="M0,80 C40,76 70,62 110,58 C150,54 180,42 220,38 C260,34 290,44 330,40 C370,36 390,28 400,24 L400,100 L0,100 Z" fill="url(#ag2)"/>
+                  <!-- Line 1 -->
+                  <path d="M0,70 C40,65 70,45 110,40 C150,35 180,20 220,18 C260,16 290,30 330,24 C370,18 390,10 400,6" fill="none" stroke="url(#lg1)" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Line 2 -->
+                  <path d="M0,80 C40,76 70,62 110,58 C150,54 180,42 220,38 C260,34 290,44 330,40 C370,36 390,28 400,24" fill="none" stroke="rgba(16,185,129,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+                  <!-- Grid lines -->
+                  <line x1="0" y1="25" x2="400" y2="25" stroke="rgba(235,240,255,0.04)" stroke-width="1"/>
+                  <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(235,240,255,0.04)" stroke-width="1"/>
+                  <line x1="0" y1="75" x2="400" y2="75" stroke="rgba(235,240,255,0.04)" stroke-width="1"/>
+                </svg>
+              </div>
+
+              <!-- Mini table -->
+              <div class="chart-card">
+                <div class="cc-header">
+                  <div class="cc-title">Active Goals</div>
+                </div>
+                <div class="mini-table">
+                  <div class="mt-row">
+                    <div class="mt-avatar" style="background:linear-gradient(135deg,#5468FF,#8B5CF6)"></div>
+                    <div class="mt-name">Half Marathon</div>
+                    <div class="mt-val">68%</div>
+                    <div class="mt-badge mt-badge-g">On track</div>
+                  </div>
+                  <div class="mt-row">
+                    <div class="mt-avatar" style="background:linear-gradient(135deg,#06B6D4,#5468FF)"></div>
+                    <div class="mt-name">Side Project Launch</div>
+                    <div class="mt-val">45%</div>
+                    <div class="mt-badge mt-badge-y">At risk</div>
+                  </div>
+                  <div class="mt-row">
+                    <div class="mt-avatar" style="background:linear-gradient(135deg,#10B981,#06B6D4)"></div>
+                    <div class="mt-name">Read 12 Books</div>
+                    <div class="mt-val">83%</div>
+                    <div class="mt-badge mt-badge-g">Ahead</div>
+                  </div>
+                  <div class="mt-row">
+                    <div class="mt-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)"></div>
+                    <div class="mt-name">Morning Routine</div>
+                    <div class="mt-val">91%</div>
+                    <div class="mt-badge mt-badge-g">Strong</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Donut -->
+              <div class="chart-card">
+                <div class="cc-header">
+                  <div class="cc-title">Category Split</div>
+                </div>
+                <div class="donut-wrap">
+                  <svg viewBox="0 0 80 80" style="width:80px;height:80px;transform:rotate(-90deg);flex-shrink:0">
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="12"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="#5468FF" stroke-width="12" stroke-dasharray="113 75" stroke-linecap="round"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="#8B5CF6" stroke-width="12" stroke-dasharray="56 132" stroke-dashoffset="-113" stroke-linecap="round"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="#10B981" stroke-width="12" stroke-dasharray="19 169" stroke-dashoffset="-169" stroke-linecap="round"/>
+                  </svg>
+                  <div class="donut-legend">
+                    <div class="dl-item"><div class="dl-dot" style="background:#5468FF"></div><span class="dl-label">Career</span><span class="dl-val">60%</span></div>
+                    <div class="dl-item"><div class="dl-dot" style="background:#8B5CF6"></div><span class="dl-label">Health</span><span class="dl-val">30%</span></div>
+                    <div class="dl-item"><div class="dl-dot" style="background:#10B981"></div><span class="dl-label">Mind</span><span class="dl-val">10%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  BRIDGE — STATS BAR
+═══════════════════════════════════════ -->
+<div style="background:var(--raised);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px var(--px);">
+  <div style="max-width:var(--max);margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:40px;">
+    <div style="flex:1;text-align:center;border-right:1px solid var(--line);padding-right:40px;">
+      <div style="font-size:36px;font-weight:800;letter-spacing:-2px;color:var(--ink)">3</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-45);margin-top:3px">Platforms Designed</div>
+    </div>
+    <div style="flex:1;text-align:center;border-right:1px solid var(--line);padding-right:40px;">
+      <div style="font-size:36px;font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--a),var(--v));-webkit-background-clip:text;-webkit-text-fill-color:transparent">8mo</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-45);margin-top:3px">End-to-End Process</div>
+    </div>
+    <div style="flex:1;text-align:center;border-right:1px solid var(--line);padding-right:40px;">
+      <div style="font-size:36px;font-weight:800;letter-spacing:-2px;color:var(--ink)">+247%</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-45);margin-top:3px">Goal Completion Rate</div>
+    </div>
+    <div style="flex:1;text-align:center;">
+      <div style="font-size:36px;font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">94%</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-45);margin-top:3px">30-Day Retention</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+  §1  OVERVIEW
+═══════════════════════════════════════ -->
+<section id="overview" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:120px;">
+    <div class="s-num" style="top:-60px;right:-40px;opacity:0.025">01</div>
+    <div class="overview-layout">
+      <div class="ov-left">
+        <div class="s-label reveal">Project Overview</div>
+        <h2 class="s-heading reveal d1">One<br>ecosystem.<br><em>Infinite</em><br>potential.</h2>
+        <p class="ov-desc reveal d2">SurpassIN is a multi-platform career development ecosystem connecting individual growth with organizational intelligence — designed for employees, coaches, and enterprise HR teams.</p>
+        <div class="ov-stat-row reveal d3">
+          <div>
+            <div class="ov-stat-num" style="--grad:linear-gradient(135deg,var(--a),var(--v))">24</div>
+            <div class="ov-stat-label">User interviews</div>
+          </div>
+          <div>
+            <div class="ov-stat-num" style="--grad:linear-gradient(135deg,var(--green),var(--cyan))">850</div>
+            <div class="ov-stat-label">Survey responses</div>
+          </div>
+          <div>
+            <div class="ov-stat-num" style="--grad:linear-gradient(135deg,var(--am),#F97316)">12</div>
+            <div class="ov-stat-label">Competitors audited</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ov-cards">
+        <div class="ov-card reveal d1">
+          <div class="ov-card-header">
+            <span class="ov-card-title">About the Product</span>
+            <span class="chip chip-blue">SaaS Platform</span>
+          </div>
+          <div class="ov-card-body">
+            <ul>
+              <li>Personal growth & workforce development platform</li>
+              <li>DISC behavioral profiling engine</li>
+              <li>Goal intelligence with AI milestone breakdown</li>
+              <li>Vision board & structured journaling</li>
+              <li>Coach–client relationship management</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ov-card reveal d2">
+          <div class="ov-card-header">
+            <span class="ov-card-title">My Role & Responsibilities</span>
+            <span class="chip chip-violet">Lead Designer</span>
+          </div>
+          <div class="ov-card-body">
+            <ul>
+              <li>End-to-end UX process from discovery to handoff</li>
+              <li>Cross-platform design system architecture</li>
+              <li>User research, synthesis, and personas</li>
+              <li>Interaction design & prototyping</li>
+              <li>Stakeholder presentation & alignment</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ov-card reveal d3">
+          <div class="ov-card-header">
+            <span class="ov-card-title">Tools & Stack</span>
+            <span class="chip chip-amber">8 Tools</span>
+          </div>
+          <div class="ov-card-body">
+            <div class="tools-flex">
+              <span class="chip chip-blue">Figma</span>
+              <span class="chip chip-blue">FigJam</span>
+              <span class="chip chip-violet">Framer</span>
+              <span class="chip chip-violet">Notion</span>
+              <span class="chip chip-green">Maze</span>
+              <span class="chip chip-green">Lottie</span>
+              <span class="chip chip-amber">Miro</span>
+              <span class="chip chip-amber">Whimsical</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §2  PROBLEM
+═══════════════════════════════════════ -->
+<section id="problem" class="section">
+  <div class="bg-accent"></div>
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-20px;left:-60px;opacity:0.02">02</div>
+
+    <div class="s-label reveal">Problem Statement</div>
+    <h2 class="problem-statement reveal d1">
+      Growth tools are <span class="highlight">fragmented,</span><br>
+      disengaging, and built without<br>
+      <em style="font-family:var(--f-serif);font-style:italic;font-weight:400;">behavioral depth.</em>
+    </h2>
+
+    <div class="pain-list">
+      <div class="pain-item reveal">
+        <div class="pain-n">01</div>
+        <div>
+          <div class="pain-title">Fragmented Tool Landscape</div>
+          <div class="pain-stat">Users average 5–7 separate apps to manage goals, habits, journal, and wellness</div>
+        </div>
+        <div class="pain-body">No single platform bridges individual development with team accountability. The context-switching creates friction, reduces consistency, and kills motivation before progress compounds.</div>
+      </div>
+      <div class="pain-item reveal d1">
+        <div class="pain-n">02</div>
+        <div>
+          <div class="pain-title">Zero Behavioral Intelligence</div>
+          <div class="pain-stat">Existing tools ignore personality science entirely — one-size-fits-all fails 87% of users</div>
+        </div>
+        <div class="pain-body">Without understanding the user's psychological profile, productivity tools default to generic frameworks that don't align with individual motivation styles, decision-making patterns, or learning preferences.</div>
+      </div>
+      <div class="pain-item reveal d2">
+        <div class="pain-n">03</div>
+        <div>
+          <div class="pain-title">The Two-Week Abandonment Cliff</div>
+          <div class="pain-stat">Industry average shows 87% app abandonment within 14 days — no adaptive feedback loops</div>
+        </div>
+        <div class="pain-body">Without meaningful progress signals, variable reward mechanics, and personalized nudges, users disengage rapidly. The product needs to create emotional investment, not just feature utility.</div>
+      </div>
+    </div>
+
+    <div class="s-label reveal" style="margin-bottom:28px">Design Goals</div>
+    <div class="goal-grid">
+      <div class="goal-card reveal d1">
+        <div class="goal-icon-wrap">🧠</div>
+        <div class="goal-title">Behavioral Science First</div>
+        <p class="goal-body">Design every flow rooted in psychology — habit stacking, variable rewards, and DISC-aligned personalization that actually fits how each user thinks.</p>
+      </div>
+      <div class="goal-card reveal d2">
+        <div class="goal-icon-wrap">🔗</div>
+        <div class="goal-title">Unified Ecosystem</div>
+        <p class="goal-body">One connected platform across mobile, web, and enterprise — with seamless data continuity, shared logic, and a single coherent design language.</p>
+      </div>
+      <div class="goal-card reveal d3">
+        <div class="goal-icon-wrap">📈</div>
+        <div class="goal-title">Measurable Momentum</div>
+        <p class="goal-body">Build adaptive feedback loops that surface real progress metrics, creating emotional investment and motivating continued engagement through visible transformation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §3  RESEARCH
+═══════════════════════════════════════ -->
+<section id="research" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;right:-40px;opacity:0.02">03</div>
+    <div class="s-label reveal">Research & Discovery</div>
+    <h2 class="s-heading reveal d1" style="margin-bottom:70px">Listen before<br>you <em>design.</em></h2>
+
+    <div class="research-top">
+      <div class="big-insight-grid">
+        <div class="bi-item reveal d1">
+          <div class="bi-num" style="background:linear-gradient(135deg,var(--a),var(--v));-webkit-background-clip:text;-webkit-text-fill-color:transparent">78%</div>
+          <div><div class="bi-title">Want integrated tracking</div><div class="bi-body">Users want goals, habits, and journals unified in one place rather than context-switching between disconnected apps.</div></div>
+        </div>
+        <div class="bi-item reveal d2">
+          <div class="bi-num" style="background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">64%</div>
+          <div><div class="bi-title">Driven by visual progress</div><div class="bi-body">Charts, streaks, and progress visualizations significantly increase task completion rate and sustain longer engagement windows.</div></div>
+        </div>
+        <div class="bi-item reveal d3">
+          <div class="bi-num" style="background:linear-gradient(135deg,var(--am),#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent">91%</div>
+          <div><div class="bi-title">Want personality-matched guidance</div><div class="bi-body">Personalized recommendations aligned to behavioral profiles outperform generic productivity advice by 3× in sustained engagement.</div></div>
+        </div>
+        <div class="bi-item reveal d4">
+          <div class="bi-num" style="background:linear-gradient(135deg,var(--v),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent">52%</div>
+          <div><div class="bi-title">Prefer dark, focused interfaces</div><div class="bi-body">Reducing visual noise and adopting dark themes measurably reduces cognitive fatigue during daily tracking check-ins.</div></div>
+        </div>
+      </div>
+
+      <div class="research-right">
+        <p class="r-desc reveal">Conducted 24 in-depth user interviews, 3 diary studies over 21 days, competitive analysis of 12 applications, and an 850-response survey to rigorously map the opportunity space.</p>
+        <div class="persona-strip reveal d1">
+          <div class="persona-row">
+            <div class="pa-av" style="background:linear-gradient(135deg,var(--a),var(--v))"></div>
+            <div><div class="pa-name">Marcus, 29</div><div class="pa-role">Ambitious Professional · D-Profile</div></div>
+            <div class="pa-tags"><span class="chip chip-blue">Goal-Driven</span><span class="chip chip-violet">Analytical</span></div>
+          </div>
+          <div class="persona-row">
+            <div class="pa-av" style="background:linear-gradient(135deg,var(--cyan),var(--a))"></div>
+            <div><div class="pa-name">Priya, 34</div><div class="pa-role">Life Coach · S-Profile</div></div>
+            <div class="pa-tags"><span class="chip chip-green">Empathetic</span><span class="chip chip-blue">Visual</span></div>
+          </div>
+          <div class="persona-row">
+            <div class="pa-av" style="background:linear-gradient(135deg,#60a5fa,var(--cyan))"></div>
+            <div><div class="pa-name">Jake, 22</div><div class="pa-role">Student Athlete · I-Profile</div></div>
+            <div class="pa-tags"><span class="chip chip-amber">Competitive</span><span class="chip chip-blue">Mobile-First</span></div>
+          </div>
+          <div class="persona-row">
+            <div class="pa-av" style="background:linear-gradient(135deg,var(--v),#a78bfa)"></div>
+            <div><div class="pa-name">Sandra, 45</div><div class="pa-role">HR Director · C-Profile</div></div>
+            <div class="pa-tags"><span class="chip chip-violet">Systematic</span><span class="chip chip-green">Data-Led</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-stats-bar reveal">
+      <div class="r-stat"><div class="r-stat-n grad">24</div><div class="r-stat-l">User Interviews</div></div>
+      <div class="r-stat"><div class="r-stat-n" style="color:var(--green)">850</div><div class="r-stat-l">Survey Responses</div></div>
+      <div class="r-stat"><div class="r-stat-n" style="color:var(--am)">12</div><div class="r-stat-l">Competitors Audited</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §4  USER FLOW
+═══════════════════════════════════════ -->
+<section id="userflow" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;left:-40px;opacity:0.02">04</div>
+    <div class="s-label reveal">UX Process</div>
+    <h2 class="s-heading reveal d1">From chaos<br>to <em>clarity.</em></h2>
+
+    <!-- Primary flow diagram -->
+    <div class="flow-container reveal d2">
+      <div style="font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-25);margin-bottom:32px;">Primary User Journey — Web Platform</div>
+      <div class="flow-track">
+        <div class="flow-node active">
+          <div class="fn-dot">🎭</div>
+          <div class="fn-label">DISC Onboarding</div>
+          <div class="fn-sub">Behavioral profile</div>
+        </div>
+        <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--a-30),var(--line-a));margin-bottom:42px"></div>
+        <div class="flow-node">
+          <div class="fn-dot">🎯</div>
+          <div class="fn-label">Goal Wizard</div>
+          <div class="fn-sub">Smart breakdown</div>
+        </div>
+        <div style="flex:1;height:1px;background:var(--line);margin-bottom:42px"></div>
+        <div class="flow-node">
+          <div class="fn-dot">⚡</div>
+          <div class="fn-label">Habit Engine</div>
+          <div class="fn-sub">AI suggestions</div>
+        </div>
+        <div style="flex:1;height:1px;background:var(--line);margin-bottom:42px"></div>
+        <div class="flow-node">
+          <div class="fn-dot">📊</div>
+          <div class="fn-label">Daily Check-in</div>
+          <div class="fn-sub">Streak tracking</div>
+        </div>
+        <div style="flex:1;height:1px;background:var(--line);margin-bottom:42px"></div>
+        <div class="flow-node">
+          <div class="fn-dot">📈</div>
+          <div class="fn-label">Analytics</div>
+          <div class="fn-sub">Progress review</div>
+        </div>
+        <div style="flex:1;height:1px;background:var(--line);margin-bottom:42px"></div>
+        <div class="flow-node">
+          <div class="fn-dot">🏆</div>
+          <div class="fn-label">Level Up</div>
+          <div class="fn-sub">Milestone reward</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UX Timeline -->
+    <div class="ux-timeline reveal">
+      <div style="font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-25);margin-bottom:40px;">Design Process Timeline</div>
+      <div style="display:flex;position:relative;">
+        <div style="position:absolute;top:15px;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--a-30),var(--line-a),var(--line));z-index:0;"></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 1–2</div><div class="ux-phase-title">Discover</div><div class="ux-phase-desc">Research, interviews & competitor audit</div></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 3–4</div><div class="ux-phase-title">Define</div><div class="ux-phase-desc">Personas, journeys & problem framing</div></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 5–8</div><div class="ux-phase-title">Ideate</div><div class="ux-phase-desc">Sketches, wireframes & IA mapping</div></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 9–14</div><div class="ux-phase-title">Prototype</div><div class="ux-phase-desc">Hi-fi designs & micro-interactions</div></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 15–18</div><div class="ux-phase-title">Validate</div><div class="ux-phase-desc">Usability testing & iteration</div></div>
+        <div class="ux-phase"><div class="ux-phase-dot"></div><div class="ux-phase-week">Wk 19–24</div><div class="ux-phase-title">Ship</div><div class="ux-phase-desc">Handoff, QA & system finalized</div></div>
+      </div>
+    </div>
+
+    <!-- Wireframe grid -->
+    <div style="font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-25);margin-top:70px;margin-bottom:24px;" class="reveal">Low-Fidelity Wireframes</div>
+    <div class="wf-grid">
+      <div class="wf-card reveal d1">
+        <div class="wf-screen">
+          <div class="wf-line" style="width:65%"></div>
+          <div class="wf-block"></div>
+          <div class="wf-sm"></div>
+          <div class="wf-sm" style="width:80%"></div>
+          <div class="wf-block" style="height:44px"></div>
+          <div class="wf-sm" style="width:50%"></div>
+        </div>
+        <div class="wf-label">Onboarding / DISC Flow</div>
+      </div>
+      <div class="wf-card reveal d2">
+        <div class="wf-screen">
+          <div class="wf-line" style="width:55%"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px">
+            <div class="wf-block" style="height:34px;margin:0"></div>
+            <div class="wf-block" style="height:34px;margin:0"></div>
+            <div class="wf-block" style="height:34px;margin:0"></div>
+            <div class="wf-block" style="height:34px;margin:0"></div>
+          </div>
+          <div class="wf-block" style="height:44px"></div>
+        </div>
+        <div class="wf-label">Dashboard Home</div>
+      </div>
+      <div class="wf-card reveal d3">
+        <div class="wf-screen">
+          <div class="wf-line" style="width:70%"></div>
+          <div class="wf-block" style="height:52px;background:rgba(84,104,255,0.06);border-color:rgba(84,104,255,0.1)"></div>
+          <div class="wf-sm"></div>
+          <div class="wf-sm" style="width:85%"></div>
+          <div class="wf-sm" style="width:70%"></div>
+          <div class="wf-block" style="height:20px;width:60%;background:rgba(84,104,255,0.08);border-color:rgba(84,104,255,0.12)"></div>
+        </div>
+        <div class="wf-label">Goal Detail View</div>
+      </div>
+      <div class="wf-card reveal d4">
+        <div class="wf-screen">
+          <div class="wf-line" style="width:80%"></div>
+          <div style="display:flex;gap:5px;margin-bottom:7px">
+            <div style="flex:1;height:70px;background:var(--ink-03);border:1px dashed var(--ink-06);border-radius:7px"></div>
+            <div style="flex:1;height:70px;background:var(--ink-03);border:1px dashed var(--ink-06);border-radius:7px"></div>
+          </div>
+          <div class="wf-sm"></div>
+          <div class="wf-sm" style="width:65%"></div>
+        </div>
+        <div class="wf-label">Analytics & Charts</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §5  WEB APP
+═══════════════════════════════════════ -->
+<section id="webapp" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);">
+    <div class="s-num" style="top:-40px;right:-50px;opacity:0.02">05</div>
+    <div class="webapp-header reveal">
+      <div class="webapp-header-row">
+        <div>
+          <div class="s-label">Web Application</div>
+          <h2 class="s-heading d1">Command center<br>for <em>growth.</em></h2>
+        </div>
+        <div style="max-width:380px">
+          <p style="font-size:15px;color:var(--ink-70);line-height:1.75;">The web dashboard serves as the strategic layer — where users plan, track, and analyze their development journey across long horizons.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-bleed dashboard -->
+  <div style="padding:0 var(--px);max-width:var(--max);margin:0 auto;">
+    <div class="webapp-full reveal d2">
+      <div class="webapp-browser-bar">
+        <div class="browser-dots" style="display:flex;gap:6px"><div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div></div>
+        <div class="webapp-nav-tabs">
+          <div class="tab-item active">Dashboard</div>
+          <div class="tab-item">Goals</div>
+          <div class="tab-item">Analytics</div>
+          <div class="tab-item">Habits</div>
+          <div class="tab-item">Journal</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <div style="width:26px;height:26px;border-radius:6px;background:var(--ink-06)"></div>
+          <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--v))"></div>
+        </div>
+      </div>
+
+      <div class="webapp-layout">
+        <div class="webapp-sb">
+          <div class="wsb-logo">Surpass<em>IN</em></div>
+          <div class="wsb-nav">
+            <div class="wsb-label">Main</div>
+            <div class="wsb-item active"><div class="wsb-icon"></div><span class="wsb-text">Overview</span></div>
+            <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Goals</span></div>
+            <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Habits</span></div>
+            <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Journal</span></div>
+          </div>
+          <div class="wsb-divider"></div>
+          <div class="wsb-label">Analytics</div>
+          <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Progress</span></div>
+          <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Reports</span></div>
+          <div class="wsb-divider"></div>
+          <div class="wsb-label">Profile</div>
+          <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">DISC Profile</span></div>
+          <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Vision Board</span></div>
+          <div class="wsb-item"><div class="wsb-icon"></div><span class="wsb-text">Settings</span></div>
+        </div>
+
+        <div class="webapp-body-content">
+          <div class="wb-topbar">
+            <span class="wb-page-title">Analytics Dashboard</span>
+            <div class="wb-topbar-right">
+              <div class="wb-chip">This Month</div>
+              <div class="wb-chip">All Platforms</div>
+              <div class="wb-avatar"></div>
+            </div>
+          </div>
+
+          <div class="wb-content">
+            <div class="analytics-kpis">
+              <div class="a-kpi"><div class="a-kpi-bar" style="background:var(--a)"></div><div class="a-kpi-label">TOTAL SCORE</div><div class="a-kpi-val">847</div><div class="a-kpi-change" style="color:var(--green)">↑ 12%</div></div>
+              <div class="a-kpi"><div class="a-kpi-bar" style="background:var(--green)"></div><div class="a-kpi-label">COMPLETION</div><div class="a-kpi-val">78%</div><div class="a-kpi-change" style="color:var(--green)">↑ 8%</div></div>
+              <div class="a-kpi"><div class="a-kpi-bar" style="background:var(--am)"></div><div class="a-kpi-label">STREAK</div><div class="a-kpi-val">24d</div><div class="a-kpi-change" style="color:var(--am)">Personal best</div></div>
+              <div class="a-kpi"><div class="a-kpi-bar" style="background:var(--v)"></div><div class="a-kpi-label">ACTIVE GOALS</div><div class="a-kpi-val">7</div><div class="a-kpi-change" style="color:var(--ink-45)">+2 this wk</div></div>
+              <div class="a-kpi"><div class="a-kpi-bar" style="background:var(--cyan)"></div><div class="a-kpi-label">COHORT RANK</div><div class="a-kpi-val">Top 8%</div><div class="a-kpi-change" style="color:var(--green)">↑ 3 positions</div></div>
+            </div>
+
+            <div class="analytics-charts">
+              <div class="a-chart">
+                <div class="a-chart-header">
+                  <span class="a-chart-title">Weekly Performance Index</span>
+                  <div class="a-chart-filters">
+                    <div class="a-filter">7d</div>
+                    <div class="a-filter active">30d</div>
+                    <div class="a-filter">90d</div>
+                  </div>
+                </div>
+                <svg viewBox="0 0 500 120" style="width:100%;height:120px;" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(84,104,255,0.20)"/>
+                      <stop offset="100%" stop-color="rgba(84,104,255,0.0)"/>
+                    </linearGradient>
+                    <linearGradient id="wl1" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#5468FF"/><stop offset="100%" stop-color="#8B5CF6"/>
+                    </linearGradient>
+                  </defs>
+                  <rect width="500" height="30" y="0" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="0.5"/>
+                  <rect width="500" height="30" y="30" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="0.5"/>
+                  <rect width="500" height="30" y="60" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="0.5"/>
+                  <rect width="500" height="30" y="90" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="0.5"/>
+                  <path d="M0,90 C30,85 60,72 100,64 C140,56 170,30 210,26 C250,22 280,36 320,28 C360,20 420,10 500,4 L500,120 L0,120Z" fill="url(#wg1)"/>
+                  <path d="M0,90 C30,85 60,72 100,64 C140,56 170,30 210,26 C250,22 280,36 320,28 C360,20 420,10 500,4" fill="none" stroke="url(#wl1)" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="500" cy="4" r="4" fill="#8B5CF6"/>
+                  <circle cx="210" cy="26" r="3" fill="rgba(84,104,255,0.8)"/>
+                </svg>
+              </div>
+
+              <div class="a-chart">
+                <div class="a-chart-header"><span class="a-chart-title">User Breakdown</span></div>
+                <div class="a-table">
+                  <div class="a-table-header">
+                    <div class="ath">User</div>
+                    <div class="ath">Score</div>
+                    <div class="ath">Goals</div>
+                    <div class="ath">Status</div>
+                  </div>
+                  <div class="a-table-row">
+                    <div class="atr-name"><div class="atr-av" style="background:linear-gradient(135deg,var(--a),var(--v))"></div>Marcus R.</div>
+                    <div class="atr-val">847</div>
+                    <div class="atr-val">7</div>
+                    <div class="atr-badge atr-badge-g">Active</div>
+                  </div>
+                  <div class="a-table-row">
+                    <div class="atr-name"><div class="atr-av" style="background:linear-gradient(135deg,var(--cyan),var(--a))"></div>Priya S.</div>
+                    <div class="atr-val">792</div>
+                    <div class="atr-val">5</div>
+                    <div class="atr-badge atr-badge-g">Active</div>
+                  </div>
+                  <div class="a-table-row">
+                    <div class="atr-name"><div class="atr-av" style="background:linear-gradient(135deg,#60a5fa,var(--cyan))"></div>Jake T.</div>
+                    <div class="atr-val">631</div>
+                    <div class="atr-val">4</div>
+                    <div class="atr-badge atr-badge-y">At Risk</div>
+                  </div>
+                  <div class="a-table-row">
+                    <div class="atr-name"><div class="atr-av" style="background:linear-gradient(135deg,var(--v),#a78bfa)"></div>Sandra K.</div>
+                    <div class="atr-val">910</div>
+                    <div class="atr-val">9</div>
+                    <div class="atr-badge atr-badge-b">Champion</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen trio -->
+  <div class="wrap">
+    <div class="screen-trio">
+      <div class="st-card reveal d1">
+        <div class="st-screen" style="background:linear-gradient(145deg,var(--base),#0d1228)">
+          <div style="padding:14px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--a);margin-bottom:8px">GOAL TRACKER</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="background:rgba(84,104,255,0.10);border:1px solid rgba(84,104,255,0.18);border-radius:11px;padding:12px">
+                <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">Half Marathon</div>
+                <div style="height:4px;background:var(--ink-06);border-radius:2px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:68%;background:linear-gradient(90deg,var(--a),var(--v));border-radius:2px"></div></div>
+                <div style="font-size:10px;color:var(--ink-45);display:flex;justify-content:space-between"><span>68%</span><span>28d left</span></div>
+              </div>
+              <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:11px;padding:12px">
+                <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">Read 12 Books</div>
+                <div style="height:4px;background:var(--ink-06);border-radius:2px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:83%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:2px"></div></div>
+                <div style="font-size:10px;color:var(--ink-45);display:flex;justify-content:space-between"><span>10/12</span><span>Ahead</span></div>
+              </div>
+              <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.15);border-radius:11px;padding:12px">
+                <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px">Launch Side Project</div>
+                <div style="height:4px;background:var(--ink-06);border-radius:2px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:45%;background:linear-gradient(90deg,var(--am),#F97316);border-radius:2px"></div></div>
+                <div style="font-size:10px;color:var(--am);display:flex;justify-content:space-between"><span>45%</span><span>⚠ At risk</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="st-info"><div class="st-title">Goal Intelligence</div><div class="st-sub">Smart progress tracking & milestone alerts</div></div>
+      </div>
+
+      <div class="st-card reveal d2">
+        <div class="st-screen" style="background:linear-gradient(145deg,#0d1228,var(--base))">
+          <div style="padding:14px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:8px">HABIT ENGINE</div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="height:30px;background:var(--raised);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;padding:0 10px;gap:8px">
+                <div style="width:12px;height:12px;border-radius:3px;background:var(--a);flex-shrink:0"></div>
+                <div style="font-size:11px;color:var(--ink);flex:1;font-weight:500">Morning meditation</div>
+                <div style="font-size:10px;color:var(--green);font-weight:700">🔥 14</div>
+              </div>
+              <div style="height:30px;background:var(--raised);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;padding:0 10px;gap:8px">
+                <div style="width:12px;height:12px;border-radius:3px;background:var(--a);flex-shrink:0"></div>
+                <div style="font-size:11px;color:var(--ink);flex:1;font-weight:500">30 min reading</div>
+                <div style="font-size:10px;color:var(--green);font-weight:700">🔥 7</div>
+              </div>
+              <div style="height:30px;background:var(--raised);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;padding:0 10px;gap:8px">
+                <div style="width:12px;height:12px;border-radius:3px;border:1.5px solid var(--ink-25);flex-shrink:0"></div>
+                <div style="font-size:11px;color:var(--ink-45);flex:1;font-weight:500">Evening journal</div>
+                <div style="font-size:10px;color:var(--ink-45)">5</div>
+              </div>
+              <div style="height:30px;background:var(--raised);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;padding:0 10px;gap:8px">
+                <div style="width:12px;height:12px;border-radius:3px;border:1.5px solid var(--ink-25);flex-shrink:0"></div>
+                <div style="font-size:11px;color:var(--ink-45);flex:1;font-weight:500">Cold shower</div>
+                <div style="font-size:10px;color:var(--ink-45)">3</div>
+              </div>
+              <div style="margin-top:6px;height:3px;background:var(--ink-06);border-radius:2px;overflow:hidden"><div style="height:100%;width:60%;background:linear-gradient(90deg,var(--a),var(--v));border-radius:2px"></div></div>
+              <div style="font-size:10px;color:var(--ink-45);text-align:right">3/4 habits complete today</div>
+            </div>
+          </div>
+        </div>
+        <div class="st-info"><div class="st-title">Habit Manager</div><div class="st-sub">Daily tracking with streak mechanics</div></div>
+      </div>
+
+      <div class="st-card reveal d3">
+        <div class="st-screen" style="background:linear-gradient(145deg,#0d1228,#0a0e1e)">
+          <div style="padding:14px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--v);margin-bottom:8px">ANALYTICS</div>
+            <svg viewBox="0 0 260 80" style="width:100%;margin-bottom:8px" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="sc1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(84,104,255,0.2)"/><stop offset="100%" stop-color="rgba(84,104,255,0)"/></linearGradient>
+              </defs>
+              <path d="M0,65 C20,60 40,45 65,38 C90,31 110,15 135,12 C160,9 180,22 205,16 C230,10 245,6 260,2 L260,80 L0,80Z" fill="url(#sc1)"/>
+              <path d="M0,65 C20,60 40,45 65,38 C90,31 110,15 135,12 C160,9 180,22 205,16 C230,10 245,6 260,2" fill="none" stroke="rgba(84,104,255,0.8)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+              <div style="text-align:center;padding:8px;background:var(--raised);border:1px solid var(--line);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-0.8px">78%</div>
+                <div style="font-size:9px;color:var(--ink-45)">Goals</div>
+              </div>
+              <div style="text-align:center;padding:8px;background:var(--raised);border:1px solid var(--line);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--green);letter-spacing:-0.8px">847</div>
+                <div style="font-size:9px;color:var(--ink-45)">Score</div>
+              </div>
+              <div style="text-align:center;padding:8px;background:var(--raised);border:1px solid var(--line);border-radius:8px">
+                <div style="font-size:16px;font-weight:800;color:var(--a);letter-spacing:-0.8px">24d</div>
+                <div style="font-size:9px;color:var(--ink-45)">Streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="st-info"><div class="st-title">Performance Analytics</div><div class="st-sub">Multi-dimensional progress reporting</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §6  MOBILE
+═══════════════════════════════════════ -->
+<section id="mobile" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;left:-50px;opacity:0.02">06</div>
+    <div class="mobile-header-grid">
+      <div>
+        <div class="s-label reveal">Mobile Application</div>
+        <h2 class="s-heading reveal d1">Growth in<br>your <em>pocket.</em></h2>
+      </div>
+      <div>
+        <p class="mobile-desc reveal d2">The mobile experience is where growth becomes a daily ritual — an intentional, frictionless companion that meets users in the moments that matter: morning routines, midday check-ins, and evening reflections.</p>
+      </div>
+    </div>
+
+    <!-- Phones composition -->
+    <div class="phones-composition reveal d1">
+      <!-- Phone 1: Dashboard -->
+      <div class="phone phone-sm p-1">
+        <div class="phone-notch"></div>
+        <div class="phone-inner" style="background:var(--surface)">
+          <div class="psc-header"><div class="psc-greet">Good Morning</div><div class="psc-name">Marcus ✦</div></div>
+          <div class="psc-body">
+            <div class="psc-hero-card">
+              <div class="phc-label">Today's Score</div>
+              <div class="phc-num">847</div>
+              <div class="phc-sub">↑ 12% vs yesterday</div>
+            </div>
+            <div class="psc-prog-row">
+              <div class="ppr"><div class="ppr-label">Goals</div><div class="ppr-bar"><div class="ppr-fill" style="width:72%"></div></div></div>
+              <div class="ppr"><div class="ppr-label">Habits</div><div class="ppr-bar"><div class="ppr-fill" style="width:88%"></div></div></div>
+              <div class="ppr"><div class="ppr-label">Focus</div><div class="ppr-bar"><div class="ppr-fill" style="width:60%"></div></div></div>
+            </div>
+            <div class="psc-habits">
+              <div class="ph-item"><div class="ph-check done"></div><span class="ph-text">Morning meditation</span><span class="ph-streak">🔥14</span></div>
+              <div class="ph-item"><div class="ph-check done"></div><span class="ph-text">30 min reading</span><span class="ph-streak">🔥7</span></div>
+              <div class="ph-item"><div class="ph-check"></div><span class="ph-text">Evening journal</span><span class="ph-streak">5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 2: Goals (featured) -->
+      <div class="phone phone-lg p-2" style="box-shadow:0 40px 100px rgba(84,104,255,0.2),0 0 0 1px rgba(84,104,255,0.15)">
+        <div class="phone-notch"></div>
+        <div class="phone-inner" style="background:var(--surface)">
+          <div class="psc-header" style="background:linear-gradient(180deg,rgba(84,104,255,0.15),transparent)">
+            <div class="psc-greet">My Goals</div>
+            <div class="psc-name">Q2 Milestones</div>
+          </div>
+          <div class="psg-body">
+            <div class="goal-pill" style="background:rgba(84,104,255,0.12);border-color:rgba(84,104,255,0.22)">
+              <div class="gp-cat" style="color:var(--a)">🏃 FITNESS</div>
+              <div class="gp-title">Run a half marathon</div>
+              <div class="gp-prog"><div class="gp-fill" style="width:68%;background:linear-gradient(90deg,var(--a),var(--v))"></div></div>
+              <div class="gp-meta"><span>68% complete</span><span>28 days left</span></div>
+            </div>
+            <div class="goal-pill" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.18)">
+              <div class="gp-cat" style="color:var(--green)">📚 LEARNING</div>
+              <div class="gp-title">Read 12 books</div>
+              <div class="gp-prog"><div class="gp-fill" style="width:83%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div></div>
+              <div class="gp-meta"><span>10/12 books</span><span>Ahead of schedule</span></div>
+            </div>
+            <div class="goal-pill" style="background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.18)">
+              <div class="gp-cat" style="color:var(--am)">🚀 CAREER</div>
+              <div class="gp-title">Launch side project</div>
+              <div class="gp-prog"><div class="gp-fill" style="width:45%;background:linear-gradient(90deg,var(--am),#F97316)"></div></div>
+              <div class="gp-meta"><span style="color:var(--am)">⚠ 45% · At risk</span><span>45 days left</span></div>
+            </div>
+            <div class="goal-pill" style="background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.18)">
+              <div class="gp-cat" style="color:var(--v)">🧘 WELLNESS</div>
+              <div class="gp-title">Daily meditation streak</div>
+              <div class="gp-prog"><div class="gp-fill" style="width:91%;background:linear-gradient(90deg,var(--v),var(--a))"></div></div>
+              <div class="gp-meta"><span>91% complete</span><span>Strong 🔥</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 3: Vision Board -->
+      <div class="phone phone-md p-3">
+        <div class="phone-notch"></div>
+        <div class="phone-inner" style="background:var(--surface)">
+          <div class="psc-header"><div class="psc-greet">Vision Board</div><div class="psc-name">My Future Self</div></div>
+          <div class="pvb-body">
+            <div class="pvb-grid">
+              <div class="pvb-cell" style="background:linear-gradient(135deg,rgba(84,104,255,0.25),rgba(139,92,246,0.2));border:1px solid rgba(84,104,255,0.2)">🏔</div>
+              <div class="pvb-cell" style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(84,104,255,0.15));border:1px solid rgba(6,182,212,0.15)">✈️</div>
+              <div class="pvb-cell" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(84,104,255,0.1));border:1px solid rgba(245,158,11,0.12)">💪</div>
+              <div class="pvb-cell" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.12)">📚</div>
+              <div class="pvb-cell" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.12)">🏡</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 4: DISC -->
+      <div class="phone phone-sm p-4">
+        <div class="phone-notch"></div>
+        <div class="phone-inner" style="background:var(--surface)">
+          <div class="psc-header"><div class="psc-greet">Your Profile</div><div class="psc-name">DISC Analysis</div></div>
+          <div class="disc-body">
+            <div class="disc-archetype">
+              <div class="da-tag">Behavioral Archetype</div>
+              <div class="da-title" style="background:linear-gradient(135deg,var(--ink),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent">The Driver</div>
+              <div class="da-sub">Dominant · Decisive · Direct</div>
+            </div>
+            <div class="disc-bars">
+              <div class="disc-bar-col"><div class="disc-bar-fill" style="height:70px;background:linear-gradient(180deg,var(--a),rgba(84,104,255,0.2))"></div><div class="disc-bar-lbl" style="color:var(--a)">D</div></div>
+              <div class="disc-bar-col"><div class="disc-bar-fill" style="height:42px;background:linear-gradient(180deg,var(--v),rgba(139,92,246,0.2))"></div><div class="disc-bar-lbl" style="color:var(--v)">I</div></div>
+              <div class="disc-bar-col"><div class="disc-bar-fill" style="height:28px;background:linear-gradient(180deg,var(--cyan),rgba(6,182,212,0.2))"></div><div class="disc-bar-lbl" style="color:var(--cyan)">S</div></div>
+              <div class="disc-bar-col"><div class="disc-bar-fill" style="height:52px;background:linear-gradient(180deg,#a78bfa,rgba(167,139,250,0.2))"></div><div class="disc-bar-lbl" style="color:#a78bfa">C</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature grid -->
+    <div class="mobile-features">
+      <div class="mf reveal d1"><div class="mf-icon">🔥</div><div class="mf-title">Habit Streaks</div><p class="mf-body">Gamified streak system with variable reward mechanics to sustain long-term behavioral change.</p></div>
+      <div class="mf reveal d2"><div class="mf-icon">🎯</div><div class="mf-title">Goal GPS</div><p class="mf-body">AI-powered goal breakdown with adaptive milestones and personalized daily check-in prompts.</p></div>
+      <div class="mf reveal d3"><div class="mf-icon">🧬</div><div class="mf-title">DISC Engine</div><p class="mf-body">Behavioral profiling that personalizes the entire product experience to your psychological archetype.</p></div>
+      <div class="mf reveal d4"><div class="mf-icon">✨</div><div class="mf-title">Vision Board</div><p class="mf-body">Interactive visual boards that bridge aspirational identity with daily actionable habits.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §7  ADMIN
+═══════════════════════════════════════ -->
+<section id="admin" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;right:-40px;opacity:0.02">07</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:60px;">
+      <div>
+        <div class="s-label reveal">Admin Dashboard</div>
+        <h2 class="s-heading reveal d1">Enterprise<br><em>intelligence.</em></h2>
+      </div>
+      <div>
+        <p style="font-size:15px;color:var(--ink-70);line-height:1.8;" class="reveal d2">Designed for HR teams, coaches, and organization leaders to monitor engagement, manage user access, generate reports, and drive measurable transformation at scale.</p>
+      </div>
+    </div>
+
+    <div class="admin-canvas reveal">
+      <div class="admin-appbar">
+        <span class="aab-logo">SurpassIN Admin</span>
+        <div class="aab-search"><div class="aab-search-icon"></div><div class="aab-search-line"></div></div>
+        <div class="aab-actions">
+          <div class="aab-btn">🔔</div>
+          <div class="aab-btn">⚙</div>
+          <div class="aab-avatar"></div>
+        </div>
+      </div>
+
+      <div class="admin-body">
+        <div class="admin-left-rail">
+          <div class="rail-icon active">📊</div>
+          <div class="rail-icon">👥</div>
+          <div class="rail-icon">📈</div>
+          <div class="rail-icon">🎯</div>
+          <div class="rail-icon" style="margin-top:auto">⚙</div>
+        </div>
+
+        <div class="admin-sidebar">
+          <div class="asb-section">Overview</div>
+          <div class="asb-item active"><div class="asb-icon"></div><span class="asb-text">Dashboard</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Analytics</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Notifications</span><span class="asb-count">12</span></div>
+          <div class="admin-divider"></div>
+          <div class="asb-section">Management</div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Users</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Teams</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Coaches</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Roles</span></div>
+          <div class="admin-divider"></div>
+          <div class="asb-section">Reports</div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Engagement</span></div>
+          <div class="asb-item"><div class="asb-icon"></div><span class="asb-text">Exports</span></div>
+        </div>
+
+        <div class="admin-content">
+          <div class="admin-breadcrumb">
+            <span class="ab-crumb">Admin</span>
+            <span class="ab-sep">›</span>
+            <span class="ab-crumb active">Dashboard</span>
+            <div class="ab-actions">
+              <div class="ab-btn ab-btn-ghost">Export</div>
+              <div class="ab-btn ab-btn-ghost">Filter</div>
+              <div class="ab-btn ab-btn-solid">+ Invite User</div>
+            </div>
+          </div>
+
+          <div class="admin-body-content">
+            <div class="adm-kpis">
+              <div class="adm-kpi"><div class="adm-kpi-strip" style="background:var(--a)"></div><div class="adm-kpi-label">TOTAL USERS</div><div class="adm-kpi-val">2,847</div><div class="adm-kpi-change" style="color:var(--green)">↑ 18% MoM</div></div>
+              <div class="adm-kpi"><div class="adm-kpi-strip" style="background:var(--green)"></div><div class="adm-kpi-label">ACTIVE TODAY</div><div class="adm-kpi-val">1,204</div><div class="adm-kpi-change" style="color:var(--green)">↑ 42%</div></div>
+              <div class="adm-kpi"><div class="adm-kpi-strip" style="background:var(--am)"></div><div class="adm-kpi-label">GOAL RATE</div><div class="adm-kpi-val">78%</div><div class="adm-kpi-change" style="color:var(--am)">→ Stable</div></div>
+              <div class="adm-kpi"><div class="adm-kpi-strip" style="background:var(--v)"></div><div class="adm-kpi-label">RETENTION</div><div class="adm-kpi-val">94.2%</div><div class="adm-kpi-change" style="color:var(--green)">↑ 6%</div></div>
+              <div class="adm-kpi"><div class="adm-kpi-strip" style="background:var(--cyan)"></div><div class="adm-kpi-label">AVG SCORE</div><div class="adm-kpi-val">731 pts</div><div class="adm-kpi-change" style="color:var(--green)">↑ 14%</div></div>
+            </div>
+
+            <div class="adm-main">
+              <div class="adm-chart">
+                <div class="adm-chart-header">
+                  <span class="adm-chart-title">User Engagement — Last 30 Days</span>
+                  <div class="adm-legend">
+                    <span><span class="adm-leg-dot" style="background:var(--a)"></span><span class="adm-leg-label">Active</span></span>
+                    <span><span class="adm-leg-dot" style="background:var(--green)"></span><span class="adm-leg-label">New</span></span>
+                  </div>
+                </div>
+                <svg viewBox="0 0 400 90" style="width:100%;flex:1;" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="ag3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(84,104,255,0.2)"/><stop offset="100%" stop-color="rgba(84,104,255,0)"/></linearGradient>
+                  </defs>
+                  <path d="M0,75 L30,68 L60,55 L90,50 L120,42 L150,38 L180,30 L210,24 L240,18 L270,20 L300,14 L330,10 L360,8 L400,4 L400,90 L0,90Z" fill="url(#ag3)"/>
+                  <path d="M0,75 L30,68 L60,55 L90,50 L120,42 L150,38 L180,30 L210,24 L240,18 L270,20 L300,14 L330,10 L360,8 L400,4" fill="none" stroke="rgba(84,104,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M0,82 L30,79 L60,72 L90,68 L120,62 L150,58 L180,52 L210,48 L240,44 L270,46 L300,40 L330,36 L360,32 L400,28" fill="none" stroke="rgba(16,185,129,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"/>
+                </svg>
+                <div class="adm-table">
+                  <div class="adm-table-head">
+                    <div class="admt-header">User</div>
+                    <div class="admt-header">Department</div>
+                    <div class="admt-header">Score</div>
+                    <div class="admt-header">Status</div>
+                    <div class="admt-header">Action</div>
+                  </div>
+                  <div class="adm-table-rows">
+                    <div class="adm-row"><div class="adm-cell-name"><div class="adm-av" style="background:linear-gradient(135deg,var(--a),var(--v))"></div><div><div class="adm-name">Marcus Reed</div><div class="adm-email">marcus@acme.co</div></div></div><div class="adm-cell">Engineering</div><div class="adm-cell" style="font-weight:700;color:var(--ink)">847</div><div class="adm-status"><span class="atr-badge atr-badge-g">Active</span></div><div class="adm-cell" style="color:var(--a);font-size:11px;font-weight:600;cursor:pointer">View →</div></div>
+                    <div class="adm-row"><div class="adm-cell-name"><div class="adm-av" style="background:linear-gradient(135deg,var(--cyan),var(--a))"></div><div><div class="adm-name">Priya Sharma</div><div class="adm-email">priya@acme.co</div></div></div><div class="adm-cell">Product</div><div class="adm-cell" style="font-weight:700;color:var(--ink)">910</div><div class="adm-status"><span class="atr-badge atr-badge-b">Champion</span></div><div class="adm-cell" style="color:var(--a);font-size:11px;font-weight:600;cursor:pointer">View →</div></div>
+                    <div class="adm-row"><div class="adm-cell-name"><div class="adm-av" style="background:linear-gradient(135deg,#60a5fa,var(--cyan))"></div><div><div class="adm-name">Jake Torres</div><div class="adm-email">jake@acme.co</div></div></div><div class="adm-cell">Sales</div><div class="adm-cell" style="font-weight:700;color:var(--ink)">631</div><div class="adm-status"><span class="atr-badge atr-badge-y">At Risk</span></div><div class="adm-cell" style="color:var(--a);font-size:11px;font-weight:600;cursor:pointer">View →</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="adm-chart" style="flex:1">
+                  <div class="adm-chart-header"><span class="adm-chart-title">Platform Usage</span></div>
+                  <svg viewBox="0 0 80 80" style="width:80px;height:80px;transform:rotate(-90deg);display:block;margin:0 auto">
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(235,240,255,0.04)" stroke-width="12"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(84,104,255,0.8)" stroke-width="12" stroke-dasharray="113 75" stroke-linecap="round"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(16,185,129,0.6)" stroke-width="12" stroke-dasharray="56 132" stroke-dashoffset="-113" stroke-linecap="round"/>
+                    <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(245,158,11,0.5)" stroke-width="12" stroke-dasharray="19 169" stroke-dashoffset="-169" stroke-linecap="round"/>
+                  </svg>
+                  <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px"><span style="color:var(--ink-45);display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:rgba(84,104,255,0.8);display:inline-block"></span>Mobile App</span><span style="font-weight:700;color:var(--ink)">60%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px"><span style="color:var(--ink-45);display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:rgba(16,185,129,0.6);display:inline-block"></span>Web App</span><span style="font-weight:700;color:var(--ink)">30%</span></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px"><span style="color:var(--ink-45);display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:rgba(245,158,11,0.5);display:inline-block"></span>Admin</span><span style="font-weight:700;color:var(--ink)">10%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin features -->
+    <div class="admin-features">
+      <div class="af-card reveal d1"><div class="af-num">01 / Feature</div><div class="af-title">User Management</div><p class="af-body">Manage members, assign coaches, configure roles and permissions across the entire organization hierarchy.</p></div>
+      <div class="af-card reveal d2"><div class="af-num">02 / Feature</div><div class="af-title">Analytics Hub</div><p class="af-body">Deep engagement metrics, habit completion rates, goal attainment tracking, and cohort benchmarking.</p></div>
+      <div class="af-card reveal d3"><div class="af-num">03 / Feature</div><div class="af-title">Report Builder</div><p class="af-body">Custom exportable reports for HR reviews, board presentations, and performance cycle documentation.</p></div>
+      <div class="af-card reveal d4"><div class="af-num">04 / Feature</div><div class="af-title">Access Control</div><p class="af-body">Granular role-based permissions for admins, coaches, team leads, and organization stakeholders.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §8  DESIGN SYSTEM
+═══════════════════════════════════════ -->
+<section id="designsystem" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;left:-40px;opacity:0.02">08</div>
+    <div class="ds-intro">
+      <div>
+        <div class="s-label reveal">Design System</div>
+        <h2 class="s-heading reveal d1">Built on a<br>unified <em>language.</em></h2>
+      </div>
+      <div>
+        <p class="ds-tagline reveal d2">"A system that lets any platform speak the same visual dialect — consistently, scalably, and without compromise."</p>
+      </div>
+    </div>
+
+    <div class="ds-grid">
+      <!-- Colors -->
+      <div class="ds-panel reveal d1">
+        <div class="ds-panel-title">Color System</div>
+        <div class="color-swatches">
+          <div class="c-swatch"><div class="cs-block" style="background:#5468FF"></div><div class="cs-info"><div class="cs-name">Indigo Core</div><div class="cs-hex">#5468FF</div></div></div>
+          <div class="c-swatch"><div class="cs-block" style="background:#8B5CF6"></div><div class="cs-info"><div class="cs-name">Violet</div><div class="cs-hex">#8B5CF6</div></div></div>
+          <div class="c-swatch"><div class="cs-block" style="background:#06B6D4"></div><div class="cs-info"><div class="cs-name">Cyan</div><div class="cs-hex">#06B6D4</div></div></div>
+          <div class="c-swatch"><div class="cs-block" style="background:#F59E0B"></div><div class="cs-info"><div class="cs-name">Amber</div><div class="cs-hex">#F59E0B</div></div></div>
+        </div>
+        <div class="color-utility-row">
+          <div class="cu-item"><div class="cu-block" style="background:#03060F"></div><div class="cu-label">Void</div></div>
+          <div class="cu-item"><div class="cu-block" style="background:#0A1022"></div><div class="cu-label">Surface</div></div>
+          <div class="cu-item"><div class="cu-block" style="background:#101828"></div><div class="cu-label">Raised</div></div>
+          <div class="cu-item"><div class="cu-block" style="background:#10B981"></div><div class="cu-label">Success</div></div>
+          <div class="cu-item"><div class="cu-block" style="background:#EF4444"></div><div class="cu-label">Error</div></div>
+        </div>
+      </div>
+
+      <!-- Typography -->
+      <div class="ds-panel reveal d2">
+        <div class="ds-panel-title">Typography Scale</div>
+        <div class="type-samples">
+          <div class="ts"><div class="ts-label">Display / H1 — 800wt</div><div class="ts-display">SurpassIN</div></div>
+          <div class="ts"><div class="ts-label">Heading / H2 — 700wt</div><div class="ts-h2">Career Ecosystem</div></div>
+          <div class="ts"><div class="ts-label">Editorial Serif Accent</div><div class="ts-serif">growth is a process</div></div>
+          <div class="ts"><div class="ts-label">Body / 15px — 400wt</div><div class="ts-body">Personalized insights rooted in behavioral science to keep you moving forward every day.</div></div>
+          <div class="ts"><div class="ts-label">Caption / Label</div><div class="ts-caption">Plus Jakarta Sans · DM Serif Display</div></div>
+        </div>
+      </div>
+
+      <!-- Buttons & Components -->
+      <div class="ds-panel reveal d3">
+        <div class="ds-panel-title">Components & States</div>
+        <div class="comp-showcase">
+          <div class="cs-row">
+            <button class="ds-btn-showcase dsb-solid">Primary Action</button>
+            <button class="ds-btn-showcase dsb-outline">Secondary</button>
+            <button class="ds-btn-showcase dsb-ghost">Ghost</button>
+          </div>
+          <div class="cs-row">
+            <button class="ds-btn-showcase dsb-danger dsb-sm">Destructive</button>
+            <button class="ds-btn-showcase dsb-solid dsb-sm">Small CTA</button>
+            <button class="ds-btn-showcase dsb-icon dsb-solid">✦</button>
+            <button class="ds-btn-showcase dsb-icon dsb-outline">→</button>
+          </div>
+          <div class="cs-row">
+            <span class="chip chip-green">✓ Active</span>
+            <span class="chip chip-amber">⚠ At Risk</span>
+            <span class="chip chip-blue">→ In Progress</span>
+            <span class="chip chip-violet">★ Champion</span>
+          </div>
+          <input class="ds-input" value="Search goals, habits, insights…" readonly>
+          <div class="ds-card-sample">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--ink)">Morning Routine</div>
+              <div style="font-size:11.5px;color:var(--ink-45);margin-top:2px">Habit · 14 day streak 🔥</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="chip chip-green">On Track</span>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spacing system -->
+      <div class="ds-panel reveal d4">
+        <div class="ds-panel-title">Spacing & Grid System</div>
+        <div class="spacing-system">
+          <div class="sp-row"><div class="sp-box" style="width:4px;height:16px"></div><div class="sp-info">4px — XS<span class="sp-token">space-1</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:8px;height:16px"></div><div class="sp-info">8px — SM<span class="sp-token">space-2</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:16px;height:16px"></div><div class="sp-info">16px — Base<span class="sp-token">space-4</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:24px;height:16px"></div><div class="sp-info">24px — MD<span class="sp-token">space-6</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:32px;height:16px"></div><div class="sp-info">32px — LG<span class="sp-token">space-8</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:48px;height:16px"></div><div class="sp-info">48px — XL<span class="sp-token">space-12</span></div></div>
+          <div class="sp-row"><div class="sp-box" style="width:72px;height:16px"></div><div class="sp-info">72px — 2XL<span class="sp-token">space-18</span></div></div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-25);margin-bottom:10px">Border Radius Scale</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <div style="width:28px;height:28px;background:var(--a-15);border:1px solid var(--a-30);border-radius:4px"></div>
+              <div style="width:28px;height:28px;background:var(--a-15);border:1px solid var(--a-30);border-radius:8px"></div>
+              <div style="width:28px;height:28px;background:var(--a-15);border:1px solid var(--a-30);border-radius:14px"></div>
+              <div style="width:28px;height:28px;background:var(--a-15);border:1px solid var(--a-30);border-radius:20px"></div>
+              <div style="width:28px;height:28px;background:var(--a-15);border:1px solid var(--a-30);border-radius:999px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §9  FINAL SHOWCASE
+═══════════════════════════════════════ -->
+<section id="showcase" class="section">
+  <div class="bg-glow"></div>
+  <div class="wrap" style="padding-top:var(--section-gap);">
+    <div class="s-num" style="top:-40px;right:-40px;opacity:0.02">09</div>
+    <div class="showcase-title-full reveal">
+      <div class="s-label" style="justify-content:center">Final Product</div>
+      <h2 class="s-heading">One ecosystem.<br><em>Three </em><span class="grad">experiences.</span></h2>
+    </div>
+
+    <div class="three-panel reveal d1" style="position:relative">
+      <!-- Web -->
+      <div class="tp-panel">
+        <div class="tp-screen" style="background:linear-gradient(145deg,var(--base),#0d1228)">
+          <div style="padding:16px">
+            <div style="height:36px;background:var(--raised);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;display:flex;align-items:center;padding:0 12px;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:#FF5F57"></div><div style="width:8px;height:8px;border-radius:50%;background:#FEBC2E"></div><div style="width:8px;height:8px;border-radius:50%;background:#28C840"></div><div style="flex:1;height:18px;background:var(--surface);border:1px solid var(--line);border-radius:4px;margin:0 auto;max-width:180px"></div></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
+              <div style="height:44px;background:rgba(84,104,255,0.10);border:1px solid rgba(84,104,255,0.18);border-radius:9px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--a)"></div></div>
+              <div style="height:44px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.15);border-radius:9px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--green)"></div></div>
+              <div style="height:44px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.14);border-radius:9px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--am)"></div></div>
+              <div style="height:44px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.16);border-radius:9px;position:relative;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--v)"></div></div>
+            </div>
+            <div style="background:var(--raised);border:1px solid var(--line);border-radius:11px;padding:12px;height:140px;display:flex;flex-direction:column;gap:8px">
+              <div style="height:7px;width:80px;background:var(--ink-10);border-radius:3px"></div>
+              <svg style="flex:1;width:100%" viewBox="0 0 260 80" preserveAspectRatio="none">
+                <defs><linearGradient id="tfg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(84,104,255,0.2)"/><stop offset="100%" stop-color="rgba(84,104,255,0)"/></linearGradient></defs>
+                <path d="M0,65 C40,55 70,40 110,32 C150,24 180,16 220,12 C250,9 255,7 260,4 L260,80 L0,80Z" fill="url(#tfg)"/>
+                <path d="M0,65 C40,55 70,40 110,32 C150,24 180,16 220,12 C250,9 255,7 260,4" fill="none" stroke="rgba(84,104,255,0.8)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="tp-label"><div class="tp-label-tag">Web Dashboard</div><div class="tp-label-title">Command Center</div><div class="tp-label-sub">Analytics · Goal Tracking · Reports</div></div>
+      </div>
+
+      <!-- Mobile (featured) -->
+      <div class="tp-panel" style="background:var(--base)">
+        <div class="tp-screen" style="background:linear-gradient(180deg,#0d1228,var(--base));display:flex;align-items:center;justify-content:center;">
+          <div style="width:160px;aspect-ratio:9/19.5;background:var(--surface);border-radius:30px;border:1.5px solid rgba(84,104,255,0.2);overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(84,104,255,0.2)">
+            <div style="position:absolute;top:7px;left:50%;transform:translateX(-50%);width:48px;height:6px;background:var(--void);border-radius:3px;z-index:5"></div>
+            <div style="padding:20px 12px 10px;display:flex;flex-direction:column;gap:6px;height:100%">
+              <div style="font-size:8px;color:rgba(235,240,255,0.4);letter-spacing:1px;margin-top:4px">GOOD MORNING</div>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);letter-spacing:-0.3px">Marcus ✦</div>
+              <div style="background:linear-gradient(135deg,rgba(84,104,255,0.22),rgba(139,92,246,0.16));border:1px solid rgba(84,104,255,0.22);border-radius:13px;padding:12px">
+                <div style="font-size:7px;color:rgba(235,240,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Today's Score</div>
+                <div style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px;line-height:1">847</div>
+                <div style="font-size:8px;color:var(--a);font-weight:600;margin-top:2px">↑ 12% vs yesterday</div>
+              </div>
+              <div style="display:flex;gap:4px">
+                <div style="flex:1;background:var(--raised);border:1px solid var(--line);border-radius:8px;padding:7px"><div style="font-size:6px;color:var(--ink-45);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Goals</div><div style="height:2.5px;background:var(--ink-06);border-radius:2px"><div style="height:100%;width:72%;background:linear-gradient(90deg,var(--a),var(--v));border-radius:2px"></div></div></div>
+                <div style="flex:1;background:var(--raised);border:1px solid var(--line);border-radius:8px;padding:7px"><div style="font-size:6px;color:var(--ink-45);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Habits</div><div style="height:2.5px;background:var(--ink-06);border-radius:2px"><div style="height:100%;width:88%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:2px"></div></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:3px;flex:1">
+                <div style="height:22px;background:var(--raised);border:1px solid var(--line);border-radius:7px;display:flex;align-items:center;padding:0 7px;gap:5px"><div style="width:10px;height:10px;border-radius:2px;background:var(--a)"></div><div style="font-size:7.5px;color:var(--ink);flex:1;font-weight:500">Morning meditation</div><div style="font-size:7px;color:var(--green);font-weight:700">🔥14</div></div>
+                <div style="height:22px;background:var(--raised);border:1px solid var(--line);border-radius:7px;display:flex;align-items:center;padding:0 7px;gap:5px"><div style="width:10px;height:10px;border-radius:2px;background:var(--a)"></div><div style="font-size:7.5px;color:var(--ink);flex:1;font-weight:500">30 min reading</div><div style="font-size:7px;color:var(--green);font-weight:700">🔥7</div></div>
+                <div style="height:22px;background:var(--raised);border:1px solid var(--line);border-radius:7px;display:flex;align-items:center;padding:0 7px;gap:5px"><div style="width:10px;height:10px;border-radius:2px;border:1.5px solid var(--ink-25)"></div><div style="font-size:7.5px;color:var(--ink-45);flex:1">Evening journal</div><div style="font-size:7px;color:var(--ink-45)">5</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tp-label"><div class="tp-label-tag">Mobile Application</div><div class="tp-label-title">Daily Growth Companion</div><div class="tp-label-sub">iOS · Android · Habit & Goal Tracking</div></div>
+      </div>
+
+      <!-- Admin -->
+      <div class="tp-panel">
+        <div class="tp-screen" style="background:linear-gradient(145deg,#0d1228,var(--base))">
+          <div style="padding:12px">
+            <div style="height:30px;background:var(--raised);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;display:flex;align-items:center;padding:0 10px;gap:8px;font-size:10px;font-weight:800;color:var(--ink)">SurpassIN Admin<div style="flex:1"></div><div style="width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--v))"></div></div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px">
+              <div style="height:34px;background:rgba(84,104,255,0.1);border:1px solid rgba(84,104,255,0.2);border-radius:7px;position:relative;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--a)"></div></div>
+              <div style="height:34px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.14);border-radius:7px;position:relative;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--green)"></div></div>
+              <div style="height:34px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.14);border-radius:7px;position:relative;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--am)"></div></div>
+              <div style="height:34px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.16);border-radius:7px;position:relative;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--v)"></div></div>
+              <div style="height:34px;background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.14);border-radius:7px;position:relative;overflow:hidden"><div style="position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--cyan)"></div></div>
+            </div>
+            <div style="background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;height:80px;display:flex;align-items:flex-end;gap:3px">
+              <div style="flex:1;height:40%;background:rgba(84,104,255,0.3);border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:62%;background:rgba(84,104,255,0.4);border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:50%;background:rgba(84,104,255,0.3);border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:85%;background:rgba(84,104,255,0.5);border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:65%;background:rgba(84,104,255,0.35);border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:95%;background:linear-gradient(180deg,var(--a),rgba(84,104,255,0.3));border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:75%;background:rgba(84,104,255,0.4);border-radius:2px 2px 0 0"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="height:16px;background:var(--raised);border:1px solid var(--line);border-radius:5px;display:flex;align-items:center;padding:0 6px;gap:5px"><div style="width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--v));flex-shrink:0"></div><div style="height:4px;flex:1;background:var(--ink-06);border-radius:2px"></div><div style="height:9px;width:20px;border-radius:3px;background:rgba(16,185,129,0.15)"></div></div>
+              <div style="height:16px;background:var(--raised);border:1px solid var(--line);border-radius:5px;display:flex;align-items:center;padding:0 6px;gap:5px"><div style="width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--a));flex-shrink:0"></div><div style="height:4px;flex:1;background:var(--ink-06);border-radius:2px"></div><div style="height:9px;width:20px;border-radius:3px;background:rgba(245,158,11,0.15)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="tp-label"><div class="tp-label-tag">Admin Panel</div><div class="tp-label-title">Enterprise Intelligence</div><div class="tp-label-sub">Analytics · User Mgmt · Reports</div></div>
+      </div>
+
+      <!-- Floating metric cards -->
+      <div class="metric-float" style="top:-28px;right:-16px">
+        <div class="mf-card">
+          <div class="mfc-label">30-Day Retention</div>
+          <div class="mfc-val">94.2%</div>
+          <div class="mfc-tag">↑ 6% vs benchmark</div>
+        </div>
+      </div>
+      <div class="metric-float" style="bottom:80px;left:-20px">
+        <div class="mf-card mf-card-2">
+          <div class="mfc-label">Goal Completion</div>
+          <div class="mfc-val">+247%</div>
+          <div class="mfc-spark">
+            <div class="mfc-spark-bar" style="height:40%;background:rgba(84,104,255,0.4)"></div>
+            <div class="mfc-spark-bar" style="height:55%;background:rgba(84,104,255,0.5)"></div>
+            <div class="mfc-spark-bar" style="height:70%;background:rgba(84,104,255,0.6)"></div>
+            <div class="mfc-spark-bar" style="height:88%;background:rgba(84,104,255,0.7)"></div>
+            <div class="mfc-spark-bar" style="height:100%;background:linear-gradient(180deg,var(--a),var(--v))"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §10  OUTCOME
+═══════════════════════════════════════ -->
+<section id="outcome" class="section">
+  <div class="wrap" style="padding-top:var(--section-gap);padding-bottom:var(--section-gap);">
+    <div class="s-num" style="top:-40px;right:-40px;opacity:0.02">10</div>
+    <div class="s-label reveal">Impact & Reflection</div>
+    <h2 class="s-heading reveal d1" style="margin-bottom:80px">Measurable<br><em>results.</em></h2>
+
+    <div class="outcome-layout">
+      <div>
+        <h3 style="font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;" class="reveal d1">Impact Metrics</h3>
+        <p style="font-size:14px;color:var(--ink-45);margin-bottom:0;" class="reveal d2">The design decisions translated into quantifiable improvements across all three platforms — validating the research-driven, behavioral-science approach.</p>
+        <div class="outcome-metrics">
+          <div class="om-row reveal d1"><div class="om-header"><span class="om-label">30-Day User Retention</span><span class="om-val">94%</span></div><div class="om-track"><div class="om-fill" style="--w:0.94"></div></div></div>
+          <div class="om-row reveal d2"><div class="om-header"><span class="om-label">Goal Completion Rate</span><span class="om-val">78%</span></div><div class="om-track"><div class="om-fill" style="--w:0.78"></div></div></div>
+          <div class="om-row reveal d3"><div class="om-header"><span class="om-label">Daily Active Usage</span><span class="om-val">86%</span></div><div class="om-track"><div class="om-fill" style="--w:0.86"></div></div></div>
+          <div class="om-row reveal d4"><div class="om-header"><span class="om-label">User Satisfaction Score</span><span class="om-val">4.8 / 5</span></div><div class="om-track"><div class="om-fill" style="--w:0.96"></div></div></div>
+          <div class="om-row reveal d5"><div class="om-header"><span class="om-label">Enterprise Team Adoption</span><span class="om-val">63%</span></div><div class="om-track"><div class="om-fill" style="--w:0.63"></div></div></div>
+        </div>
+      </div>
+
+      <div class="learnings">
+        <div class="learning reveal d1">
+          <div class="l-num">01 —</div>
+          <div><div class="l-title">Dark UI Reduces Session Friction</div><div class="l-body">Shifting to a dark-first interface reduced daily session abandonment by 34%. Users reported feeling "less overwhelmed" during evening and morning check-ins — validating our design hypothesis.</div></div>
+        </div>
+        <div class="learning reveal d2">
+          <div class="l-num">02 —</div>
+          <div><div class="l-title">Personality Science Drives Retention</div><div class="l-body">DISC-personalized onboarding increased 7-day retention from 41% to 79%. The right experience for the right behavioral type is a retention superpower, not just a nice-to-have.</div></div>
+        </div>
+        <div class="learning reveal d3">
+          <div class="l-num">03 —</div>
+          <div><div class="l-title">Ecosystem Thinking Multiplies Outcomes</div><div class="l-body">Users who engaged across both mobile and web showed 3.2× higher goal achievement. Cross-platform continuity isn't a technical challenge — it's a strategic design advantage.</div></div>
+        </div>
+        <div class="learning reveal d4">
+          <div class="l-num">04 —</div>
+          <div><div class="l-title">Design Systems Pay Back Exponentially</div><div class="l-body">Investing heavily in a unified design system reduced development handoff time by 60% and enabled consistent, coherent experiences across all three products simultaneously.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scalability-grid">
+      <div class="sc-card reveal d1"><div class="sc-icon">🤖</div><div class="sc-title">AI Coaching Layer</div><p class="sc-body">Next iteration includes LLM-powered behavioral coaching with adaptive goal suggestions and proactive nudge intelligence aligned to user archetype.</p></div>
+      <div class="sc-card reveal d2"><div class="sc-icon">🌐</div><div class="sc-title">Global Expansion</div><p class="sc-body">Multi-language support, culturally-adapted goal frameworks, and localized DISC interpretations for 12 initial target markets.</p></div>
+      <div class="sc-card reveal d3"><div class="sc-icon">🏢</div><div class="sc-title">Enterprise Tier</div><p class="sc-body">White-label capabilities, advanced org-level analytics, and deep API integrations with HRIS platforms like Workday and BambooHR.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+  §11  CLOSING
+═══════════════════════════════════════ -->
+<section id="closing" class="section">
+  <div class="closing-glow"></div>
+  <div class="wrap closing-inner">
+    <div class="reveal">
+      <p class="closing-eyebrow">Thank you for reading</p>
+      <h2 class="closing-title">Surpass<span class="grad">IN</span><br><span class="serif">is just beginning.</span></h2>
+      <p class="closing-sub">Designed for the humans who refuse to settle — and the organizations bold enough to invest in them.</p>
+      <div class="closing-actions">
+        <a href="#hero" class="btn btn-solid">↑ Back to Top</a>
+        <a href="#overview" class="btn btn-outline">View Full Process →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final cinematic browser -->
+  <div style="padding:0 var(--px);max-width:var(--max);margin:0 auto;" class="reveal d2">
+    <div class="closing-browser">
+      <div class="cb-bar">
+        <div class="browser-dots"><div class="b-dot"></div><div class="b-dot"></div><div class="b-dot"></div></div>
+        <div class="browser-url" style="margin:0 auto"><div class="url-lock"></div><span class="url-text">surpassin.io</span></div>
+      </div>
+      <div class="cb-screen">
+        <div class="cb-bg-orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(84,104,255,0.12) 0%,transparent 70%);top:50%;left:30%;transform:translate(-50%,-50%)"></div>
+        <div class="cb-bg-orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,transparent 70%);top:50%;right:10%;transform:translateY(-50%)"></div>
+        <div class="cb-center">
+          <div class="cb-brand">SurpassIN™</div>
+          <div class="cb-tagline">Enterprise Workforce & Career Ecosystem · 2024–25</div>
+          <div class="cb-chips">
+            <span class="chip chip-blue">UX Design</span>
+            <span class="chip chip-violet">Product Strategy</span>
+            <span class="chip chip-green">Design Systems</span>
+            <span class="chip chip-amber">Research & Discovery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left"><strong>SurpassIN™</strong> — Enterprise Workforce & Career Ecosystem · UX Case Study · 2025</div>
+  <div class="footer-right">
+    <span class="chip chip-blue">Lead Product Designer</span>
+    <span class="chip chip-violet">8 Months</span>
+  </div>
+</footer>
+
+<script>
+/* ─── PROGRESS BAR ─── */
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / scrollHeight) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+}, { passive: true });
+
+/* ─── REVEAL OBSERVER ─── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('up');
+    }
+  });
+}, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ─── METRIC BARS ANIMATION ─── */
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.om-fill').forEach((fill, i) => {
+        const w = parseFloat(fill.style.getPropertyValue('--w'));
+        fill.style.width = '0%';
+        setTimeout(() => {
+          fill.style.transform = `scaleX(1)`;
+          fill.classList.add('animated');
+        }, 200 + i * 100);
+      });
+    }
+  });
+}, { threshold: 0.4 });
+const metricsEl = document.querySelector('.outcome-metrics');
+if (metricsEl) barObserver.observe(metricsEl);
+
+/* ─── METRIC BARS REAL WIDTHS ─── */
+document.querySelectorAll('.om-fill').forEach(fill => {
+  const w = fill.style.getPropertyValue('--w');
+  fill.style.width = (parseFloat(w) * 100) + '%';
+});
+
+/* ─── NAV ACTIVE ─── */
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 140) current = s.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+}, { passive: true });
+
+/* ─── PARALLAX LIGHTS ─── */
+document.addEventListener('mousemove', (e) => {
+  const mx = (e.clientX / window.innerWidth - 0.5);
+  const my = (e.clientY / window.innerHeight - 0.5);
+  document.querySelectorAll('.hero-light').forEach((l, i) => {
+    const f = (i + 1) * 0.5;
+    l.style.transform = `translate(${mx * 40 * f}px, ${my * 30 * f}px)`;
+  });
+}, { passive: true });
+
+/* ─── SMOOTH METRIC FILL ON LOAD ─── */
+document.querySelectorAll('.om-fill').forEach(fill => {
+  const w = parseFloat(fill.style.getPropertyValue('--w'));
+  fill.style.transform = 'scaleX(0)';
+  fill.style.width = (w * 100) + '%';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PULSE — Mission-Critical Operational Ecosystem</title>
+<meta name="description" content="Command-and-control platform for incident coordination, responder operations, SOP execution, and real-time operational visibility.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --radius: 0.25rem;
+  --bg: #0f1117;
+  --fg: #f2f0ec;
+  --surface: #13161d;
+  --surface-elevated: #181b24;
+  --card: #151821;
+  --muted: #3d414d;
+  --muted-fg: #8a8f9a;
+  --primary: #e5a040;
+  --primary-fg: #0f1117;
+  --secondary: #22252e;
+  --secondary-fg: #f2f0ec;
+  --accent: #5ec4c4;
+  --alert: #d45a3a;
+  --signal: #7bc96f;
+  --border: #2a2d38;
+  --border-strong: #3d414d;
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* Utilities */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(58,61,74,0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(58,61,74,0.35) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.scan-lines {
+  background-image: repeating-linear-gradient(
+    0deg, transparent 0px, transparent 3px, rgba(255,255,255,0.015) 3px, rgba(255,255,255,0.015) 4px
+  );
+}
+.radial-fade {
+  background: radial-gradient(ellipse at center, transparent 30%, var(--bg) 80%);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker 60s linear infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.25; }
+}
+.blink { animation: blink 1.2s steps(1) infinite; }
+
+@keyframes sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.sweep {
+  animation: sweep 8s linear infinite;
+  transform-origin: center;
+}
+
+/* Layout */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 640px) {
+  .container { padding-left: 2.5rem; padding-right: 2.5rem; }
+}
+
+/* Typography helpers */
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+
+/* Tag */
+.tag {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  border: 1px solid var(--border-strong); padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--muted-fg);
+}
+.tag-alert { border-color: rgba(212,90,58,0.6); color: var(--alert); background: rgba(212,90,58,0.1); }
+.tag-signal { border-color: rgba(123,201,111,0.6); color: var(--signal); background: rgba(123,201,111,0.1); }
+.tag-accent { border-color: rgba(94,196,196,0.6); color: var(--accent); background: rgba(94,196,196,0.1); }
+
+/* Dot */
+.dot {
+  position: relative; display: inline-flex; width: 6px; height: 6px;
+}
+.dot-inner {
+  position: relative; display: inline-flex; width: 6px; height: 6px; border-radius: 9999px;
+}
+.dot-signal .dot-inner { background: var(--signal); }
+.dot-alert .dot-inner { background: var(--alert); }
+.dot-accent .dot-inner { background: var(--accent); }
+.dot-muted .dot-inner { background: var(--muted-fg); }
+
+/* Sections */
+section { position: relative; }
+.border-b { border-bottom: 1px solid var(--border); }
+.bg-surface { background: var(--surface); }
+.bg-card { background: var(--card); }
+
+/* TopBar */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  border-bottom: 1px solid var(--border);
+  background: rgba(15,17,23,0.85); backdrop-filter: blur(12px);
+}
+.topbar-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 0;
+}
+.topbar-logo {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.topbar-icon {
+  position: relative; display: grid; place-items: center;
+  width: 28px; height: 28px; border: 1px solid rgba(229,160,64,0.7);
+}
+.topbar-icon-dot {
+  width: 6px; height: 6px; border-radius: 9999px; background: var(--primary);
+}
+.topbar-title {
+  font-family: var(--font-display); font-size: 1.25rem; line-height: 1;
+}
+.topbar-meta {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.topbar-coords {
+  display: none; align-items: baseline; gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .topbar-coords { display: flex; }
+}
+.coord {
+  display: flex; align-items: baseline; gap: 0.5rem;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+.coord-label { color: var(--muted-fg); }
+.coord-value { color: var(--fg); }
+
+/* Ticker */
+.ticker {
+  border-bottom: 1px solid var(--border);
+  background: rgba(19,22,29,0.6); padding: 0.5rem 0;
+  overflow: hidden;
+}
+.ticker-inner {
+  display: flex; width: max-content; gap: 2.5rem;
+  white-space: nowrap; font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.ticker-item { display: flex; align-items: center; gap: 0.75rem; }
+.ticker-diamond { color: var(--alert); }
+
+/* Hero */
+.hero {
+  position: relative; overflow: hidden; border-bottom: 1px solid var(--border);
+  padding-bottom: 6rem; padding-top: 5rem;
+}
+@media (min-width: 640px) {
+  .hero { padding-top: 7rem; }
+}
+.hero-tags {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.hero h1 {
+  font-family: var(--font-display); line-height: 0.95; letter-spacing: -0.02em;
+  font-size: clamp(2.75rem, 7vw, 6.5rem); max-width: 64rem; margin-top: 2.5rem;
+}
+.hero h1 .italic { color: var(--primary); font-style: italic; }
+.hero p {
+  margin-top: 2rem; max-width: 42rem; font-size: 1.125rem; line-height: 1.625;
+  color: var(--muted-fg); text-wrap: balance;
+}
+.hero-stats {
+  margin-top: 3.5rem; display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 3rem; max-width: 48rem; border-top: 1px solid var(--border); padding-top: 2rem;
+}
+@media (min-width: 640px) {
+  .hero-stats { grid-template-columns: repeat(4, 1fr); }
+}
+.stat-label {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.stat-value {
+  font-family: var(--font-display); font-size: 1.5rem; margin-top: 0.5rem;
+}
+.stat-desc {
+  font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.25rem;
+}
+.stat-primary { color: var(--primary); }
+
+/* Radar decoration */
+.radar-deco {
+  position: absolute; right: 2.5rem; top: 5rem; display: none;
+}
+@media (min-width: 1024px) {
+  .radar-deco { display: block; }
+}
+.radar-ring {
+  position: relative; width: 288px; height: 288px;
+}
+.radar-ring > .sweep {
+  position: absolute; inset: 0; border-radius: 9999px;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(229,160,64,0.25) 60deg, transparent 80deg);
+}
+.radar-ring .ring {
+  position: absolute; inset: 0; border-radius: 9999px; border: 1px solid rgba(229,160,64,0.3);
+}
+.radar-ring .ring2 { inset: 24px; border-color: rgba(229,160,64,0.2); }
+.radar-ring .ring3 { inset: 48px; border-color: rgba(229,160,64,0.15); }
+.radar-ring .ring4 { inset: 80px; border-color: rgba(229,160,64,0.1); }
+.radar-center {
+  position: absolute; left: 50%; top: 50%;
+  width: 6px; height: 6px; border-radius: 9999px; background: var(--primary);
+  transform: translate(-50%, -50%);
+}
+
+/* Command Center */
+.cmd-center { padding: 6rem 0; }
+.cmd-header {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem;
+}
+.cmd-header h2 {
+  font-family: var(--font-display); line-height: 1.1; margin-top: 1rem;
+  font-size: clamp(2.25rem, 4vw, 3rem); max-width: 42rem;
+}
+.cmd-header-right { display: none; align-items: center; gap: 1rem; }
+@media (min-width: 768px) { .cmd-header-right { display: flex; } }
+
+/* Console mock */
+.console {
+  margin-top: 3rem; overflow: hidden;
+  border: 1px solid var(--border-strong); background: var(--bg);
+  box-shadow: 0 40px 120px -40px rgba(0,0,0,0.6);
+}
+.console-chrome {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(19,22,29,0.8); padding: 0.625rem 1rem;
+}
+.chrome-left { display: flex; align-items: center; gap: 1rem; }
+.dots { display: flex; gap: 0.375rem; }
+.dot-btn { width: 10px; height: 10px; border-radius: 9999px; }
+.dot-btn.red { background: rgba(212,90,58,0.7); }
+.dot-btn.yel { background: rgba(229,160,64,0.7); }
+.dot-btn.grn { background: rgba(123,201,111,0.7); }
+.chrome-url {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.chrome-right {
+  display: none; align-items: center; gap: 0.75rem;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+@media (min-width: 640px) { .chrome-right { display: flex; } }
+
+.console-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border);
+}
+@media (min-width: 1024px) {
+  .console-grid { grid-template-columns: 3fr 6fr 3fr; }
+}
+
+.panel { background: var(--bg); padding: 1.25rem; }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.panel-count { font-family: var(--font-mono); font-size: 10px; color: var(--muted-fg); }
+
+.queue-items { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.queue-item {
+  border: 1px solid var(--border); background: var(--card); padding: 0.75rem;
+}
+.queue-item.alert {
+  border-color: rgba(212,90,58,0.6); background: rgba(212,90,58,0.1);
+}
+.queue-item-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.queue-title {
+  font-family: var(--font-display); font-size: 1.125rem; line-height: 1.25; margin-top: 0.5rem;
+}
+.queue-desc {
+  font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.25rem;
+}
+.timer { font-family: var(--font-mono); font-size: 10px; color: var(--alert); }
+
+/* Map panel */
+.map-panel {
+  position: relative; min-height: 520px; overflow: hidden; background: var(--bg);
+}
+.map-svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.4; }
+.map-hud {
+  position: absolute; left: 1rem; top: 1rem; display: flex; flex-direction: column; gap: 0.25rem;
+}
+.map-hud-bottom {
+  position: absolute; bottom: 1rem; left: 1rem; right: 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+
+.sos-pin {
+  position: absolute; left: 58%; top: 42%;
+}
+.sos-pin-inner {
+  position: relative;
+}
+.sos-badge {
+  position: absolute; left: 1.75rem; top: 0; white-space: nowrap;
+  border: 1px solid rgba(212,90,58,0.6); background: rgba(15,17,23,0.95);
+  padding: 0.25rem 0.5rem; font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.18em; color: var(--alert);
+}
+.responder {
+  position: absolute;
+}
+.responder-shape {
+  width: 10px; height: 10px; transform: rotate(45deg); border: 1px solid;
+}
+.responder-signal .responder-shape { border-color: var(--signal); background: rgba(123,201,111,0.4); }
+.responder-accent .responder-shape { border-color: var(--accent); background: rgba(94,196,196,0.4); }
+.responder-id {
+  margin-top: 0.25rem; font-family: var(--font-mono); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted-fg);
+}
+
+/* Telemetry panel */
+.telemetry { margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+.tele-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+.tele-label { font-size: 0.75rem; color: var(--muted-fg); }
+.tele-value { font-family: var(--font-mono); font-size: 0.75rem; }
+.tele-bar { margin-top: 0.375rem; height: 4px; background: var(--muted); }
+.tele-fill { height: 100%; }
+
+.channel-feed { margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.channel-feed-title {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.channel-list { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.channel-item {
+  display: flex; gap: 0.5rem; font-family: var(--font-mono); font-size: 11px; line-height: 1.625;
+}
+.channel-time { color: var(--muted-fg); }
+.channel-alert { color: var(--alert); }
+.channel-signal { color: var(--signal); }
+.channel-accent { color: var(--accent); }
+
+/* Section label */
+.section-label {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.section-label span:first-child { color: var(--primary); }
+.section-label .line { height: 1px; width: 32px; background: var(--border-strong); }
+
+/* Thesis */
+.thesis { padding: 8rem 0; }
+.thesis-grid {
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .thesis-grid { grid-template-columns: 4fr 8fr; }
+}
+.thesis h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+}
+.thesis h2 .italic { color: var(--primary); font-style: italic; }
+.thesis p {
+  margin-top: 2rem; max-width: 42rem; font-size: 1.125rem; line-height: 1.625;
+  color: var(--muted-fg);
+}
+
+/* Ecosystem */
+.ecosystem { padding: 8rem 0; background: rgba(19,22,29,0.4); }
+.eco-header {
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .eco-header { grid-template-columns: 5fr 7fr; }
+}
+.eco-header h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+}
+.eco-header p {
+  max-width: 36rem; font-size: 1rem; line-height: 1.625; color: var(--muted-fg);
+}
+@media (min-width: 1024px) {
+  .eco-header p { padding-top: 4rem; }
+}
+
+.surface-grid {
+  margin-top: 4rem; display: grid; grid-template-columns: 1fr; gap: 1px;
+  overflow: hidden; border: 1px solid var(--border); background: var(--border);
+}
+@media (min-width: 768px) {
+  .surface-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1280px) {
+  .surface-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.surface-card {
+  background: var(--bg); padding: 2rem; display: flex; flex-direction: column; gap: 2rem;
+  transition: background 0.2s;
+}
+.surface-card:hover { background: var(--surface-elevated); }
+.surface-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.surface-num {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--primary);
+}
+.surface-meta {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--muted-fg);
+}
+.surface-card h3 {
+  font-family: var(--font-display); font-size: 1.5rem; line-height: 1.25;
+}
+.surface-card p {
+  font-size: 0.875rem; line-height: 1.625; color: var(--muted-fg); margin-top: 1rem;
+}
+.surface-divider { height: 1px; background: var(--border-strong); }
+.surface-arrow {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.surface-arrow span:last-child { color: var(--primary); }
+
+/* MapAsOS */
+.map-as-os { padding: 8rem 0; }
+.map-os-grid {
+  display: grid; grid-template-columns: 1fr; gap: 2.5rem;
+}
+@media (min-width: 1024px) {
+  .map-os-grid { grid-template-columns: 5fr 7fr; }
+}
+.map-os-grid h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+}
+.map-os-grid h2 .italic { color: var(--primary); font-style: italic; }
+.map-os-grid > div:first-child p {
+  margin-top: 2rem; max-width: 28rem; font-size: 1rem; line-height: 1.625; color: var(--muted-fg);
+}
+.feature-list { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.feature-item { border-left: 2px solid; padding-left: 1.25rem; }
+.feature-item.primary { border-color: var(--primary); }
+.feature-item.alert { border-color: var(--alert); }
+.feature-item.accent { border-color: var(--accent); }
+.feature-item h4 {
+  font-family: var(--font-display); font-size: 1.125rem;
+}
+.feature-item p {
+  margin-top: 0.25rem; font-size: 0.875rem; color: var(--muted-fg);
+}
+
+.map-visual {
+  position: relative; aspect-ratio: 4/3; overflow: hidden;
+  border: 1px solid var(--border-strong); background: var(--surface);
+}
+.map-visual .grid-bg { position: absolute; inset: 0; }
+.map-visual .scan-lines { position: absolute; inset: 0; }
+.map-visual svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-radar {
+  position: absolute; inset: 0;
+}
+.map-radar .sweep {
+  position: absolute; left: 50%; top: 50%;
+  width: 100%; height: 100%;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(229,160,64,0.18) 50deg, transparent 70deg);
+}
+.map-radar-ring {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%); border-radius: 9999px; border: 1px solid rgba(229,160,64,0.15);
+}
+.map-pins { position: absolute; inset: 0; }
+.corner {
+  position: absolute; width: 12px; height: 12px;
+}
+.map-label {
+  position: absolute; bottom: 0.75rem; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+
+/* Lifecycle */
+.lifecycle { padding: 8rem 0; background: rgba(19,22,29,0.4); }
+.lifecycle-header {
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .lifecycle-header { grid-template-columns: 5fr 7fr; }
+}
+.lifecycle-header h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+}
+.lifecycle-header h2 .italic { font-style: italic; }
+.lifecycle-header p {
+  max-width: 36rem; font-size: 1rem; line-height: 1.625; color: var(--muted-fg);
+}
+@media (min-width: 1024px) {
+  .lifecycle-header p { padding-top: 4rem; }
+}
+
+.steps-wrapper { position: relative; margin-top: 5rem; }
+.steps-line {
+  position: absolute; left: 0; right: 0; top: 34px; height: 1px;
+  background: var(--border-strong); display: none;
+}
+@media (min-width: 1024px) { .steps-line { display: block; } }
+
+.steps-grid {
+  display: grid; grid-template-columns: 1fr; gap: 1px;
+  overflow: hidden; border: 1px solid var(--border); background: var(--border);
+}
+@media (min-width: 768px) { .steps-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .steps-grid { grid-template-columns: repeat(5, 1fr); } }
+
+.step {
+  position: relative; background: var(--bg); padding: 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.step-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.step-num {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.step-divider { height: 1px; background: var(--border); }
+.step h3 {
+  font-family: var(--font-display); font-size: 1.25rem; line-height: 1.375;
+}
+.step p {
+  font-size: 0.875rem; line-height: 1.625; color: var(--muted-fg);
+}
+
+/* Principles */
+.principles { padding: 8rem 0; }
+.principles-grid {
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .principles-grid { grid-template-columns: 5fr 7fr; }
+}
+.principles-grid h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+}
+.principles-grid h2 .italic { color: var(--primary); font-style: italic; }
+
+.principles-list {
+  display: grid; grid-template-columns: 1fr; gap: 1px;
+  overflow: hidden; border: 1px solid var(--border); background: var(--border);
+}
+@media (min-width: 640px) { .principles-list { grid-template-columns: repeat(2, 1fr); } }
+
+.principle {
+  background: var(--bg); padding: 1.5rem;
+}
+.principle dt {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.principle-num {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--primary);
+}
+.principle-title {
+  font-family: var(--font-display); font-size: 1.125rem;
+}
+.principle dd {
+  margin-top: 0.75rem; font-size: 0.875rem; line-height: 1.625; color: var(--muted-fg);
+}
+
+/* Surfaces showcase */
+.surfaces { padding: 8rem 0; background: rgba(19,22,29,0.4); }
+.surfaces h2 {
+  font-family: var(--font-display); line-height: 1.02; letter-spacing: -0.02em;
+  margin-top: 1rem; max-width: 48rem;
+  font-size: clamp(2.25rem, 4.5vw, 4rem);
+}
+.surfaces h2 .italic { font-style: italic; }
+
+.devices-grid {
+  margin-top: 4rem; display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .devices-grid { grid-template-columns: 7fr 5fr; }
+}
+
+.device-mock {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--border-strong); background: var(--bg);
+}
+.device-mock.desktop { aspect-ratio: 16/10; }
+
+.desktop-inner {
+  position: absolute; inset: 0; display: grid;
+  grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(4, 1fr); gap: 0.5rem; padding: 1rem;
+}
+.desk-panel {
+  border: 1px solid var(--border); background: var(--surface); padding: 0.75rem;
+}
+.desk-panel-title {
+  font-family: var(--font-mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.desk-bar { height: 8px; background: var(--muted); margin-top: 0.75rem; }
+.desk-bar-fill { height: 100%; }
+
+.mobile-watch-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
+}
+
+.phone-mock {
+  position: relative; margin: 0 auto; width: 100%; max-width: 220px;
+  aspect-ratio: 9/19; overflow: hidden; border-radius: 28px;
+  border: 1px solid var(--border-strong); background: var(--bg); padding: 0.75rem;
+}
+.phone-notch {
+  position: absolute; left: 50%; top: 0.5rem;
+  width: 48px; height: 4px; border-radius: 9999px; background: var(--border-strong);
+  transform: translateX(-50%);
+}
+
+.watch-mock {
+  position: relative; margin: 0 auto;
+  width: 100%; max-width: 180px; aspect-ratio: 1/1;
+  display: grid; place-items: center; border-radius: 36px;
+  border: 2px solid var(--border-strong); background: var(--bg); padding: 1rem;
+}
+.watch-inner {
+  position: absolute; inset: 8px; border-radius: 28px; border: 1px solid var(--border);
+}
+.watch-crown {
+  position: absolute; right: -4px; top: 33%;
+  width: 6px; height: 32px; border-radius: 0 4px 4px 0; background: var(--border-strong);
+}
+.watch-content {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; text-align: center;
+}
+.watch-timer {
+  font-family: var(--font-display); font-size: 1.25rem; line-height: 1; margin-top: 0.5rem;
+}
+.watch-sector {
+  font-family: var(--font-mono); font-size: 8px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg); margin-top: 0.25rem;
+}
+.watch-btn {
+  margin-top: 0.75rem; height: 24px; width: 64px;
+  border: 1px solid var(--primary); background: rgba(229,160,64,0.3);
+}
+
+.device-label {
+  margin-top: 0.75rem; text-align: center;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+
+/* Closing */
+.closing {
+  position: relative; overflow: hidden; border-bottom: 1px solid var(--border);
+  padding: 10rem 0;
+}
+.closing h2 {
+  font-family: var(--font-display); line-height: 0.95; letter-spacing: -0.02em;
+  margin-top: 1.5rem; max-width: 64rem;
+  font-size: clamp(2.75rem, 7vw, 7rem);
+}
+.closing h2 .italic { color: var(--primary); font-style: italic; }
+.closing p {
+  margin-top: 2.5rem; max-width: 42rem; font-size: 1.125rem; line-height: 1.625;
+  color: var(--muted-fg);
+}
+
+.metrics-grid {
+  margin-top: 5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  overflow: hidden; border: 1px solid var(--border); background: var(--border);
+}
+@media (min-width: 768px) { .metrics-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.metric { background: var(--bg); padding: 2rem; }
+.metric-label {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.metric-value {
+  font-family: var(--font-display); font-size: 2.25rem; color: var(--primary); margin-top: 0.75rem;
+}
+
+/* Footer */
+.footer {
+  background: var(--bg);
+}
+.footer-inner {
+  display: flex; flex-direction: column; gap: 1.5rem;
+  padding: 2.5rem 0;
+}
+@media (min-width: 640px) {
+  .footer-inner {
+    flex-direction: row; align-items: center; justify-content: space-between;
+  }
+}
+.footer-logo {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.footer-icon {
+  display: grid; place-items: center; width: 24px; height: 24px;
+  border: 1px solid rgba(229,160,64,0.7);
+}
+.footer-icon-dot { width: 4px; height: 4px; border-radius: 9999px; background: var(--primary); }
+.footer-name { font-family: var(--font-display); font-size: 1rem; }
+.footer-meta {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.footer-links {
+  display: flex; align-items: center; gap: 1.5rem;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.22em; color: var(--muted-fg);
+}
+.footer-nominal { display: flex; align-items: center; gap: 0.5rem; color: var(--signal); }
+</style>
+</head>
+<body>
+
+<!-- TopBar -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-logo">
+      <div class="topbar-icon">
+        <div class="topbar-icon-dot"></div>
+        <div class="pulse-ring" style="position:absolute;inset:0;border-radius:2px;border:1px solid rgba(229,160,64,0.4);"></div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:0.5rem;">
+        <span class="topbar-title">PULSE</span>
+        <span class="topbar-meta">v4.2 · OPS</span>
+      </div>
+    </div>
+    <div class="topbar-coords">
+      <div class="coord"><span class="coord-label">LAT</span><span class="coord-value">40.7128°N</span></div>
+      <div class="coord"><span class="coord-label">LON</span><span class="coord-value">74.0060°W</span></div>
+      <div class="coord"><span class="coord-label">UTC</span><span class="coord-value">14:23:07</span></div>
+      <div class="coord">
+        <span class="dot dot-signal"><span class="pulse-ring dot-inner dot-signal" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-signal"></span></span>
+        <span style="color:var(--signal);">SYSTEM NOMINAL</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-track ticker-inner">
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> INC-2241 · SOS · SECTOR 14 · ACK 00:00:04</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> UNIT-09 EN ROUTE · ETA 03:21</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> SOP-117 INITIATED · TRAFFIC COLLISION</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> EVIDENCE PKG #4421 SEALED · CHAIN-OF-CUSTODY VERIFIED</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> ROUTE DEVIATION · UNIT-12 · 240m OFFSET</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> WATCH ESCALATION · RESPONDER-44 · MEDICAL</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> PERIMETER ZONE Δ ACTIVE · 6 UNITS</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> INC-2241 · SOS · SECTOR 14 · ACK 00:00:04</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> UNIT-09 EN ROUTE · ETA 03:21</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> SOP-117 INITIATED · TRAFFIC COLLISION</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> EVIDENCE PKG #4421 SEALED · CHAIN-OF-CUSTODY VERIFIED</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> ROUTE DEVIATION · UNIT-12 · 240m OFFSET</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> WATCH ESCALATION · RESPONDER-44 · MEDICAL</span>
+    <span class="ticker-item"><span class="ticker-diamond">◆</span> PERIMETER ZONE Δ ACTIVE · 6 UNITS</span>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="grid-bg" style="position:absolute;inset:0;opacity:0.6;"></div>
+  <div class="radial-fade" style="position:absolute;inset:0;"></div>
+
+  <div class="radar-deco">
+    <div class="radar-ring">
+      <div class="sweep"></div>
+      <div class="ring"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+      <div class="ring ring4"></div>
+      <div class="radar-center"></div>
+      <div class="pulse-ring" style="position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:9999px;background:var(--primary);transform:translate(-50%,-50%);"></div>
+    </div>
+  </div>
+
+  <div class="container" style="position:relative;">
+    <div class="hero-tags">
+      <span class="tag tag-alert">
+        <span class="dot dot-alert"><span class="pulse-ring dot-inner dot-alert" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-alert"></span></span>
+        LIVE CASE STUDY
+      </span>
+      <span class="tag">2024 — 2026</span>
+      <span class="tag tag-accent">CLASSIFIED · OPS</span>
+    </div>
+
+    <h1>Mission-Critical<br><span class="italic">Operational</span> Ecosystem.</h1>
+
+    <p>Built for the seconds that decide the outcome. A command-and-control platform engineered around incident coordination, responder operations, SOP execution, and evidence workflows — synchronized across desktop, mobile, tablet, and watch.</p>
+
+    <div class="hero-stats">
+      <div>
+        <div class="stat-label">Platforms</div>
+        <div class="stat-value">04</div>
+        <div class="stat-desc">Admin · Operator · Mobile · Watch</div>
+      </div>
+      <div>
+        <div class="stat-label">Focus</div>
+        <div class="stat-value">UX · Systems</div>
+        <div class="stat-desc">Operational design</div>
+      </div>
+      <div>
+        <div class="stat-label">Ack target</div>
+        <div class="stat-value stat-primary">&lt; 3s</div>
+        <div class="stat-desc">SOS acknowledgement</div>
+      </div>
+      <div>
+        <div class="stat-label">Surfaces</div>
+        <div class="stat-value">∞</div>
+        <div class="stat-desc">One operational language</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Command Center -->
+<section class="cmd-center bg-surface">
+  <div class="container">
+    <div class="cmd-header">
+      <div>
+        <div class="section-label"><span>01</span><span class="line"></span><span>The interface</span></div>
+        <h2>PULSE Command Center.</h2>
+      </div>
+      <div class="cmd-header-right">
+        <span class="tag tag-alert">
+          <span class="dot dot-alert"><span class="pulse-ring dot-inner dot-alert" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-alert"></span></span>
+          LIVE OPERATIONS
+        </span>
+      </div>
+    </div>
+
+    <div class="console">
+      <div class="console-chrome">
+        <div class="chrome-left">
+          <div class="dots">
+            <div class="dot-btn red"></div>
+            <div class="dot-btn yel"></div>
+            <div class="dot-btn grn"></div>
+          </div>
+          <div class="chrome-url">pulse://operator/sector-14 · INC-2241</div>
+        </div>
+        <div class="chrome-right">
+          <span>14:23:07 UTC</span>
+          <span style="height:12px;width:1px;background:var(--border-strong);"></span>
+          <span style="color:var(--signal);">● 6 UNITS ONLINE</span>
+        </div>
+      </div>
+
+      <div class="console-grid">
+        <!-- Emergency Queue -->
+        <aside class="panel">
+          <div class="panel-header">
+            <span>Emergency Queue</span>
+            <span class="panel-count">03</span>
+          </div>
+          <div class="queue-items">
+            <div class="queue-item alert">
+              <div class="queue-item-top">
+                <span class="tag tag-alert">
+                  <span class="dot dot-alert"><span class="pulse-ring dot-inner dot-alert" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-alert"></span></span>
+                  SOS
+                </span>
+                <span class="timer blink">00:00:04</span>
+              </div>
+              <div class="queue-title">Sector 14</div>
+              <div class="queue-desc">Responder requesting immediate support</div>
+            </div>
+            <div class="queue-item">
+              <div class="queue-item-top">
+                <span class="tag tag-signal">DISPATCHED</span>
+                <span class="panel-count">ETA 03:21</span>
+              </div>
+              <div class="queue-title">Traffic Collision</div>
+              <div class="queue-desc">2 responders assigned</div>
+            </div>
+            <div class="queue-item">
+              <div class="queue-item-top">
+                <span class="tag tag-accent">ALERT</span>
+                <span class="panel-count">240m</span>
+              </div>
+              <div class="queue-title">Route Deviation</div>
+              <div class="queue-desc">Unit-12 off corridor</div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Map -->
+        <div class="map-panel">
+          <div class="grid-bg" style="position:absolute;inset:0;"></div>
+          <svg viewBox="0 0 600 520" class="map-svg" preserveAspectRatio="none">
+            <defs>
+              <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#e5a040" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#e5a040" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <path d="M0 80 C 150 30, 300 130, 600 60" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 130 C 150 80, 300 180, 600 110" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 180 C 150 130, 300 230, 600 160" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 230 C 150 180, 300 280, 600 210" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 280 C 150 230, 300 330, 600 260" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 330 C 150 280, 300 380, 600 310" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 380 C 150 330, 300 430, 600 360" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M0 430 C 150 380, 300 480, 600 410" stroke="#3d414d" stroke-width="0.6" fill="none"/>
+            <path d="M40 480 L 200 320 L 360 360 L 540 180" stroke="#e5a040" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+            <path d="M80 60 L 220 200 L 340 220 L 480 420" stroke="#5ec4c4" stroke-width="1.2" stroke-dasharray="2 4" fill="none"/>
+            <circle cx="360" cy="240" r="120" fill="url(#halo)"/>
+          </svg>
+
+          <div class="sos-pin">
+            <div class="sos-pin-inner">
+              <div class="pulse-ring" style="position:absolute;inset:-8px;border-radius:9999px;background:rgba(212,90,58,0.6);"></div>
+              <div class="pulse-ring" style="position:absolute;inset:-8px;border-radius:9999px;background:rgba(212,90,58,0.6);animation-delay:0.8s;"></div>
+              <div style="position:relative;display:grid;place-items:center;width:20px;height:20px;border-radius:9999px;border:1px solid var(--alert);background:rgba(212,90,58,0.3);">
+                <div style="width:6px;height:6px;border-radius:9999px;background:var(--alert);"></div>
+              </div>
+            </div>
+            <div class="sos-badge">SOS · UNIT-09 · 02:14</div>
+          </div>
+
+          <div class="responder" style="left:32%;top:62%;">
+            <div class="responder-shape responder-signal"></div>
+            <div class="responder-id">U-04</div>
+          </div>
+          <div class="responder" style="left:44%;top:30%;">
+            <div class="responder-shape responder-signal"></div>
+            <div class="responder-id">U-07</div>
+          </div>
+          <div class="responder" style="left:72%;top:70%;">
+            <div class="responder-shape responder-accent"></div>
+            <div class="responder-id">U-12</div>
+          </div>
+          <div class="responder" style="left:22%;top:38%;">
+            <div class="responder-shape responder-signal"></div>
+            <div class="responder-id">U-02</div>
+          </div>
+
+          <div class="map-hud">
+            <div class="coord"><span class="coord-label">ZONE</span><span class="coord-value">Δ-14</span></div>
+            <div class="coord"><span class="coord-label">ZOOM</span><span class="coord-value">17.4</span></div>
+            <div class="coord"><span class="coord-label">BEAR</span><span class="coord-value">042°</span></div>
+          </div>
+          <div class="map-hud-bottom">
+            <span>MAP-AS-OS · WGS84</span>
+            <span style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="dot dot-signal"><span class="dot-inner dot-signal"></span></span>
+              4 RESPONDERS · 1 SOS · 1 DEVIATION
+            </span>
+          </div>
+        </div>
+
+        <!-- Telemetry -->
+        <aside class="panel">
+          <div class="panel-header">Telemetry · INC-2241</div>
+          <div class="telemetry">
+            <div>
+              <div class="tele-row"><span class="tele-label">Acknowledgement</span><span class="tele-value" style="color:var(--primary);">00:00:04</span></div>
+              <div class="tele-bar"><div class="tele-fill" style="width:8%;background:var(--primary);"></div></div>
+            </div>
+            <div>
+              <div class="tele-row"><span class="tele-label">Responder ETA</span><span class="tele-value" style="color:var(--signal);">03:21</span></div>
+              <div class="tele-bar"><div class="tele-fill" style="width:64%;background:var(--signal);"></div></div>
+            </div>
+            <div>
+              <div class="tele-row"><span class="tele-label">SOP coverage</span><span class="tele-value" style="color:var(--accent);">7 / 12</span></div>
+              <div class="tele-bar"><div class="tele-fill" style="width:58%;background:var(--accent);"></div></div>
+            </div>
+          </div>
+          <div class="channel-feed">
+            <div class="channel-feed-title">Channel Feed</div>
+            <ul class="channel-list">
+              <li class="channel-item"><span class="channel-time">14:22:51</span><span class="channel-alert">SOS RAISED</span></li>
+              <li class="channel-item"><span class="channel-time">14:22:55</span><span>OP-03 ACK</span></li>
+              <li class="channel-item"><span class="channel-time">14:23:01</span><span class="channel-signal">U-09 DISPATCHED</span></li>
+              <li class="channel-item"><span class="channel-time">14:23:04</span><span>SOP-117 INIT</span></li>
+              <li class="channel-item"><span class="channel-time">14:23:07</span><span class="channel-accent">U-12 DEVIATION</span></li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Thesis -->
+<section class="thesis border-b">
+  <div class="container thesis-grid">
+    <div>
+      <div class="section-label"><span>02</span><span class="line"></span><span>Thesis</span></div>
+    </div>
+    <div>
+      <h2>Clarity becomes <span class="italic">critical</span> under pressure.</h2>
+      <p>When a single delayed acknowledgement changes the outcome of an incident, the interface stops being decorative. PULSE was designed as an operational instrument — calm in the moments that demand calm, decisive in the moments that demand decisions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Ecosystem -->
+<section class="ecosystem border-b">
+  <div class="container">
+    <div class="eco-header">
+      <div>
+        <div class="section-label"><span>03</span><span class="line"></span><span>Ecosystem</span></div>
+        <h2>One ecosystem.<br><span class="italic">Multiple</span> operational surfaces.</h2>
+      </div>
+      <p>PULSE synchronizes command centers, responders, SOP systems, evidence workflows, and operational monitoring into a connected ecosystem designed for real-time emergency coordination.</p>
+    </div>
+
+    <div class="surface-grid">
+      <article class="surface-card">
+        <div class="surface-card-top">
+          <span class="surface-num">01</span>
+          <span class="surface-meta">DESKTOP · WEB</span>
+        </div>
+        <div style="flex:1;">
+          <h3>Admin Governance</h3>
+          <p>Controls operational structures, SOP systems, permissions, and ecosystem-wide workflows.</p>
+        </div>
+        <div class="surface-divider"></div>
+        <div class="surface-arrow"><span>SURFACE</span><span>→</span></div>
+      </article>
+      <article class="surface-card">
+        <div class="surface-card-top">
+          <span class="surface-num">02</span>
+          <span class="surface-meta">DESKTOP · MULTI-MONITOR</span>
+        </div>
+        <div style="flex:1;">
+          <h3>Operator Console</h3>
+          <p>Live command center for incidents, operational visibility, responder coordination, and alerts.</p>
+        </div>
+        <div class="surface-divider"></div>
+        <div class="surface-arrow"><span>SURFACE</span><span>→</span></div>
+      </article>
+      <article class="surface-card">
+        <div class="surface-card-top">
+          <span class="surface-num">03</span>
+          <span class="surface-meta">MOBILE · TABLET</span>
+        </div>
+        <div style="flex:1;">
+          <h3>Responder App</h3>
+          <p>Field-first experience for navigation, evidence capture, checklist execution, and communication.</p>
+        </div>
+        <div class="surface-divider"></div>
+        <div class="surface-arrow"><span>SURFACE</span><span>→</span></div>
+      </article>
+      <article class="surface-card">
+        <div class="surface-card-top">
+          <span class="surface-num">04</span>
+          <span class="surface-meta">WEARABLE</span>
+        </div>
+        <div style="flex:1;">
+          <h3>Watch Surface</h3>
+          <p>Hands-busy operational layer for rapid alerts, SOS escalation, and immediate actions.</p>
+        </div>
+        <div class="surface-divider"></div>
+        <div class="surface-arrow"><span>SURFACE</span><span>→</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- MapAsOS -->
+<section class="map-as-os border-b">
+  <div class="container map-os-grid">
+    <div>
+      <div class="section-label"><span>04</span><span class="line"></span><span>Map-as-OS</span></div>
+      <h2>The map became the <span class="italic">operating system</span>.</h2>
+      <p>Instead of treating maps as supporting visuals, PULSE positioned geospatial awareness at the center of operational decision-making. Incidents, routes, responders, and operational zones coexist in real time.</p>
+
+      <div class="feature-list">
+        <div class="feature-item primary">
+          <h4>Live route monitoring</h4>
+          <p>Real-time responder visibility with operational route overlays and ETA tracking.</p>
+        </div>
+        <div class="feature-item alert">
+          <h4>Emergency prioritization</h4>
+          <p>Critical alerts remain persistent until acknowledged by operators.</p>
+        </div>
+        <div class="feature-item accent">
+          <h4>Multi-incident awareness</h4>
+          <p>Simultaneous incidents, responder visibility, and route coordination on a unified canvas.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="map-visual">
+        <div class="grid-bg"></div>
+        <div class="scan-lines"></div>
+        <div class="map-radar">
+          <div class="sweep"></div>
+          <div class="map-radar-ring" style="width:22%;height:22%;"></div>
+          <div class="map-radar-ring" style="width:44%;height:44%;"></div>
+          <div class="map-radar-ring" style="width:66%;height:66%;"></div>
+          <div class="map-radar-ring" style="width:88%;height:88%;"></div>
+        </div>
+        <svg viewBox="0 0 600 450" preserveAspectRatio="none">
+          <path d="M60 380 Q 200 200 380 260 T 560 80" stroke="#e5a040" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+          <path d="M40 100 Q 180 220 320 200 T 540 360" stroke="#5ec4c4" stroke-width="1.2" stroke-dasharray="3 4" fill="none"/>
+          <path d="M120 50 Q 240 180 220 320 T 480 420" stroke="#7bc96f" stroke-width="1.2" stroke-dasharray="2 6" fill="none"/>
+        </svg>
+        <div class="map-pins">
+          <div style="position:absolute;left:63%;top:42%;">
+            <div class="pulse-ring" style="position:absolute;inset:-8px;border-radius:9999px;background:rgba(212,90,58,0.6);"></div>
+            <div style="width:12px;height:12px;border-radius:9999px;border:1px solid var(--alert);background:rgba(212,90,58,0.4);"></div>
+          </div>
+          <div style="position:absolute;left:28%;top:64%;"><div style="width:10px;height:10px;transform:rotate(45deg);border:1px solid var(--signal);background:rgba(123,201,111,0.4);"></div></div>
+          <div style="position:absolute;left:48%;top:34%;"><div style="width:10px;height:10px;transform:rotate(45deg);border:1px solid var(--signal);background:rgba(123,201,111,0.4);"></div></div>
+          <div style="position:absolute;left:78%;top:72%;"><div style="width:10px;height:10px;transform:rotate(45deg);border:1px solid var(--accent);background:rgba(94,196,196,0.4);"></div></div>
+        </div>
+        <div class="corner" style="top:0.75rem;left:0.75rem;border-top:1px solid rgba(229,160,64,0.7);border-left:1px solid rgba(229,160,64,0.7);"></div>
+        <div class="corner" style="top:0.75rem;right:0.75rem;border-top:1px solid rgba(229,160,64,0.7);border-right:1px solid rgba(229,160,64,0.7);"></div>
+        <div class="corner" style="bottom:0.75rem;left:0.75rem;border-bottom:1px solid rgba(229,160,64,0.7);border-left:1px solid rgba(229,160,64,0.7);"></div>
+        <div class="corner" style="bottom:0.75rem;right:0.75rem;border-bottom:1px solid rgba(229,160,64,0.7);border-right:1px solid rgba(229,160,64,0.7);"></div>
+        <div class="map-label">GEOSPATIAL · LAYER 0 · REAL-TIME</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lifecycle -->
+<section class="lifecycle border-b">
+  <div class="container">
+    <div class="lifecycle-header">
+      <div>
+        <div class="section-label"><span>05</span><span class="line"></span><span>Lifecycle</span></div>
+        <h2>The lifecycle of an <span class="italic">incident</span>.</h2>
+      </div>
+      <p>Every interaction was designed to maintain operational clarity from escalation to closure — a single continuous thread linking the first second of an event to its audited resolution.</p>
+    </div>
+
+    <div class="steps-wrapper">
+      <div class="steps-line"></div>
+      <ol class="steps-grid">
+        <li class="step">
+          <div class="step-top">
+            <span class="step-num">01</span>
+            <span class="dot dot-alert"><span class="pulse-ring dot-inner dot-alert" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-alert"></span></span>
+          </div>
+          <div class="step-divider"></div>
+          <h3>Incident Raised</h3>
+          <p>Incoming emergency enters the operational queue.</p>
+        </li>
+        <li class="step">
+          <div class="step-top">
+            <span class="step-num">02</span>
+            <span class="dot dot-accent"><span class="dot-inner dot-accent"></span></span>
+          </div>
+          <div class="step-divider"></div>
+          <h3>Operator Review</h3>
+          <p>Severity validation and responder activation.</p>
+        </li>
+        <li class="step">
+          <div class="step-top">
+            <span class="step-num">03</span>
+            <span class="dot dot-accent"><span class="dot-inner dot-accent"></span></span>
+          </div>
+          <div class="step-divider"></div>
+          <h3>Responder Dispatch</h3>
+          <p>Navigation, alerts, and operational context sync instantly.</p>
+        </li>
+        <li class="step">
+          <div class="step-top">
+            <span class="step-num">04</span>
+            <span class="dot dot-accent"><span class="dot-inner dot-accent"></span></span>
+          </div>
+          <div class="step-divider"></div>
+          <h3>SOP Execution</h3>
+          <p>Structured operational checklists guide the response lifecycle.</p>
+        </li>
+        <li class="step">
+          <div class="step-top">
+            <span class="step-num">05</span>
+            <span class="dot dot-signal"><span class="dot-inner dot-signal"></span></span>
+          </div>
+          <div class="step-divider"></div>
+          <h3>Evidence & Closure</h3>
+          <p>Audit-safe evidence workflows complete the operational cycle.</p>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Principles -->
+<section class="principles border-b">
+  <div class="container principles-grid">
+    <div>
+      <div class="section-label"><span>06</span><span class="line"></span><span>Operational UX</span></div>
+      <h2>Designing under pressure <span class="italic">changes everything</span>.</h2>
+    </div>
+    <div class="principles-list">
+      <div class="principle">
+        <dt><span class="principle-num">01</span><span class="principle-title">Situational awareness</span></dt>
+        <dd>Information density tuned so the operator never asks 'what's happening right now?'</dd>
+      </div>
+      <div class="principle">
+        <dt><span class="principle-num">02</span><span class="principle-title">Emergency prioritization</span></dt>
+        <dd>Severity is encoded in motion, color, persistence, and acknowledgement — not just iconography.</dd>
+      </div>
+      <div class="principle">
+        <dt><span class="principle-num">03</span><span class="principle-title">Cognitive offload</span></dt>
+        <dd>SOPs, evidence chains, and dispatch reduce decision load during simultaneous events.</dd>
+      </div>
+      <div class="principle">
+        <dt><span class="principle-num">04</span><span class="principle-title">Reduced inputs</span></dt>
+        <dd>Two-tap dispatch, single-gesture SOS, voice-augmented field operations.</dd>
+      </div>
+      <div class="principle">
+        <dt><span class="principle-num">05</span><span class="principle-title">Persistent context</span></dt>
+        <dd>An operator switching surfaces never loses the operational frame they were inside.</dd>
+      </div>
+      <div class="principle">
+        <dt><span class="principle-num">06</span><span class="principle-title">Audit by default</span></dt>
+        <dd>Every action is logged, attributable, and replayable for post-incident review.</dd>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Surfaces -->
+<section class="surfaces border-b">
+  <div class="container">
+    <div class="section-label"><span>07</span><span class="line"></span><span>Cross-surface</span></div>
+    <h2>One operational language across every <span class="italic">device</span>.</h2>
+
+    <div class="devices-grid">
+      <!-- Desktop -->
+      <div>
+        <div class="device-mock desktop">
+          <div class="grid-bg" style="position:absolute;inset:0;opacity:0.6;"></div>
+          <div class="desktop-inner">
+            <div class="desk-panel" style="grid-column:span 2;grid-row:span 2;">
+              <div class="desk-panel-title">QUEUE</div>
+              <div style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
+                <div class="desk-bar" style="background:rgba(212,90,58,0.6);"></div>
+                <div class="desk-bar" style="width:75%;"></div>
+                <div class="desk-bar" style="width:50%;"></div>
+              </div>
+            </div>
+            <div class="desk-panel" style="grid-column:span 4;grid-row:span 3;position:relative;">
+              <div class="grid-bg" style="position:absolute;inset:0;opacity:0.5;"></div>
+              <div style="position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:9999px;border:1px solid var(--alert);background:rgba(212,90,58,0.4);transform:translate(-50%,-50%);"></div>
+              <div class="pulse-ring" style="position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:9999px;background:rgba(212,90,58,0.6);transform:translate(-50%,-50%);"></div>
+              <div class="desk-panel-title" style="position:absolute;bottom:0.5rem;left:0.5rem;">MAP</div>
+            </div>
+            <div class="desk-panel" style="grid-column:span 2;grid-row:span 2;">
+              <div class="desk-panel-title">TELEMETRY</div>
+              <div style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
+                <div class="desk-bar"><div class="desk-bar-fill" style="width:25%;background:var(--primary);"></div></div>
+                <div class="desk-bar"><div class="desk-bar-fill" style="width:60%;background:var(--signal);"></div></div>
+                <div class="desk-bar"><div class="desk-bar-fill" style="width:50%;background:var(--accent);"></div></div>
+              </div>
+            </div>
+            <div class="desk-panel" style="grid-column:span 6;grid-row:span 1;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span class="desk-panel-title">CHANNEL · LIVE</span>
+                <span class="desk-panel-title" style="color:var(--signal);">● TX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="device-label" style="display:flex;justify-content:space-between;">
+          <span>OPERATOR CONSOLE</span>
+          <span>1920 × 1200 · MULTI-MONITOR</span>
+        </div>
+      </div>
+
+      <!-- Mobile + Watch -->
+      <div class="mobile-watch-grid">
+        <div>
+          <div class="phone-mock">
+            <div class="phone-notch"></div>
+            <div style="margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:0.22em;color:var(--muted-fg);">U-09</span>
+              <span style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:0.22em;color:var(--signal);">● ONLINE</span>
+            </div>
+            <div style="margin-top:0.75rem;border:1px solid rgba(212,90,58,0.6);background:rgba(212,90,58,0.1);padding:0.5rem;">
+              <div style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:0.22em;color:var(--alert);">DISPATCH</div>
+              <div style="margin-top:0.25rem;font-family:var(--font-display);font-size:0.875rem;line-height:1.25;">SOS · Sector 14</div>
+              <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted-fg);">ETA 03:21</div>
+            </div>
+            <div style="margin-top:0.5rem;display:flex;flex-direction:column;gap:0.375rem;">
+              <div style="display:flex;align-items:center;gap:0.375rem;border:1px solid var(--border);background:var(--surface);padding:0.375rem;">
+                <div style="width:8px;height:8px;border:1px solid var(--signal);background:rgba(123,201,111,0.4);"></div>
+                <div style="height:6px;flex:1;background:var(--muted);"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.375rem;border:1px solid var(--border);background:var(--surface);padding:0.375rem;">
+                <div style="width:8px;height:8px;border:1px solid var(--muted);background:var(--muted);"></div>
+                <div style="height:6px;width:75%;background:var(--muted);"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.375rem;border:1px solid var(--border);background:var(--surface);padding:0.375rem;">
+                <div style="width:8px;height:8px;border:1px solid var(--muted);background:var(--muted);"></div>
+                <div style="height:6px;width:66%;background:var(--muted);"></div>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:0.75rem;left:0.75rem;right:0.75rem;display:grid;grid-template-columns:repeat(3,1fr);gap:0.375rem;">
+              <div style="height:24px;border:1px solid var(--border);background:var(--surface);"></div>
+              <div style="height:24px;border:1px solid var(--primary);background:rgba(229,160,64,0.2);"></div>
+              <div style="height:24px;border:1px solid var(--border);background:var(--surface);"></div>
+            </div>
+          </div>
+          <div class="device-label">RESPONDER · MOBILE</div>
+        </div>
+
+        <div>
+          <div class="watch-mock">
+            <div class="watch-inner"></div>
+            <div class="watch-crown"></div>
+            <div class="watch-content">
+              <span class="tag tag-alert">
+                <span class="dot dot-alert"><span class="pulse-ring dot-inner dot-alert" style="position:absolute;inset:0;border-radius:9999px;"></span><span class="dot-inner dot-alert"></span></span>
+                SOS
+              </span>
+              <div class="watch-timer">02:14</div>
+              <div class="watch-sector">SECTOR 14</div>
+              <div class="watch-btn"></div>
+            </div>
+          </div>
+          <div class="device-label">WATCH · WEARABLE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Closing -->
+<section class="closing">
+  <div class="grid-bg" style="position:absolute;inset:0;opacity:0.4;"></div>
+  <div class="radial-fade" style="position:absolute;inset:0;"></div>
+  <div class="container" style="position:relative;">
+    <div class="section-label"><span>08</span><span class="line"></span><span>Principle</span></div>
+    <h2>Designed for the moments where <span class="italic">failure</span> is not an option.</h2>
+    <p>PULSE was built around a single operational principle: mission-critical systems should remain calm, clear, and reliable even when the environment around them is not.</p>
+
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Ack target</div>
+        <div class="metric-value">&lt; 3s</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Surfaces</div>
+        <div class="metric-value">04</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Uptime SLA</div>
+        <div class="metric-value">99.99%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Audit retention</div>
+        <div class="metric-value">7 YRS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-logo">
+      <div class="footer-icon"><div class="footer-icon-dot"></div></div>
+      <span class="footer-name">PULSE</span>
+      <span class="footer-meta">CASE STUDY · 2026</span>
+    </div>
+    <div class="footer-links">
+      <span>OPERATIONAL UX</span>
+      <span>SYSTEMS DESIGN</span>
+      <span class="footer-nominal">
+        <span class="dot dot-signal"><span class="dot-inner dot-signal"></span></span>
+        NOMINAL
+      </span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
