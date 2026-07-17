@@ -121,6 +121,7 @@ nav {
   position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
   z-index: 100; display: flex; align-items: center; gap: 40px;
   padding: 0 28px; height: 52px;
+  max-width: calc(100vw - 24px);
   background: rgba(6,10,24,0.82);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--line);
@@ -129,15 +130,16 @@ nav {
 }
 .nav-logo {
   font-size: 15px; font-weight: 800; letter-spacing: -0.5px;
-  color: var(--ink); white-space: nowrap;
+  color: var(--ink); white-space: nowrap; flex-shrink: 0;
 }
 .nav-logo em { font-style: normal; color: var(--a); }
-.nav-sep { width: 1px; height: 18px; background: var(--line); }
+.nav-sep { width: 1px; height: 18px; background: var(--line); flex-shrink: 0; }
 .nav-links { display: flex; gap: 4px; }
 .nav-links a {
   font-size: 12.5px; font-weight: 500; color: var(--ink-45);
   text-decoration: none; padding: 6px 12px; border-radius: 20px;
   transition: color 0.2s, background 0.2s; letter-spacing: 0.1px;
+  white-space: nowrap;
 }
 .nav-links a:hover, .nav-links a.active { color: var(--ink); background: var(--ink-06); }
 .nav-badge {
@@ -145,7 +147,23 @@ nav {
   color: var(--a); padding: 4px 10px;
   background: var(--a-08); border: 1px solid var(--a-15);
   border-radius: var(--r-pill);
+  white-space: nowrap; flex-shrink: 0;
 }
+/* Hamburger toggle — hidden on desktop, shown on mobile */
+.nav-toggle {
+  display: none; flex-shrink: 0;
+  width: 34px; height: 34px; padding: 0; margin-left: auto;
+  background: transparent; border: 1px solid var(--line); border-radius: 10px;
+  cursor: pointer; align-items: center; justify-content: center;
+  flex-direction: column; gap: 4px;
+}
+.nav-toggle span {
+  display: block; width: 16px; height: 2px; border-radius: 2px;
+  background: var(--ink); transition: transform 0.25s, opacity 0.2s;
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 /* ═══════════════════════════════════════
    LAYOUT PRIMITIVES
@@ -1125,14 +1143,38 @@ footer {
   .adm-kpis { grid-template-columns: repeat(3,1fr); }
   nav { top: 12px; }
 }
+/* Tighten nav spacing before it needs to collapse */
+@media (max-width: 960px) {
+  nav { gap: 20px; padding: 0 20px; }
+  .nav-links { gap: 2px; }
+  .nav-links a { padding: 6px 9px; }
+}
 @media (max-width: 768px) {
   :root { --px: 20px; }
-  .nav-links { display: none; }
+  /* Collapse the inline links into a hamburger dropdown */
+  nav { gap: 14px; width: calc(100vw - 24px); justify-content: space-between; }
+  .nav-toggle { display: flex; }
+  .nav > .nav-sep { display: none; }
+  .nav-links {
+    position: absolute; top: calc(100% + 10px); left: 0; right: 0;
+    flex-direction: column; gap: 4px; padding: 10px;
+    background: rgba(6,10,24,0.96);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    opacity: 0; visibility: hidden; transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  }
+  .nav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+  .nav-links a { padding: 10px 14px; border-radius: 12px; font-size: 14px; }
   .goal-grid, .screen-trio, .mobile-features, .admin-features, .ds-grid, .scalability-grid { grid-template-columns: 1fr; }
   .kpi-row, .analytics-kpis { grid-template-columns: 1fr 1fr; }
   .wf-grid { grid-template-columns: 1fr 1fr; }
   .r-stats-bar { grid-template-columns: 1fr; }
   .three-panel { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 480px) {
+  .nav-badge { display: none; }
 }
 </style>
 </head>
@@ -1146,7 +1188,7 @@ footer {
 <nav>
   <span class="nav-logo">Surpass<em>IN</em></span>
   <div class="nav-sep"></div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <a href="#overview">Overview</a>
     <a href="#problem">Problem</a>
     <a href="#webapp">Web App</a>
@@ -1156,6 +1198,9 @@ footer {
   </div>
   <div class="nav-sep"></div>
   <div class="nav-badge">Case Study 2025</div>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- ═══════════════════════════════════════
@@ -2626,6 +2671,27 @@ document.querySelectorAll('.om-fill').forEach(fill => {
   const w = fill.style.getPropertyValue('--w');
   fill.style.width = (parseFloat(w) * 100) + '%';
 });
+
+/* ─── MOBILE NAV TOGGLE ─── */
+const navToggle = document.getElementById('nav-toggle');
+const navLinksEl = document.getElementById('nav-links');
+if (navToggle && navLinksEl) {
+  const closeMenu = () => {
+    navLinksEl.classList.remove('open');
+    navToggle.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  };
+  navToggle.addEventListener('click', () => {
+    const open = navLinksEl.classList.toggle('open');
+    navToggle.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  // Close after tapping a link, or when clicking outside the nav
+  navLinksEl.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('nav')) closeMenu();
+  });
+}
 
 /* ─── NAV ACTIVE ─── */
 const navLinks = document.querySelectorAll('.nav-links a');
