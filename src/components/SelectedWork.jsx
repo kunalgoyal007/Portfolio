@@ -5,13 +5,6 @@ import { fadeUp, stagger, viewportOnce } from '../lib/motion'
 
 const PROJECTS = [
   {
-    id: 1,
-    image: '/images/selectedimage1.jpg',
-    title: 'Where Personal Development Meets Organizational Innovation',
-    tag: 'Product Design',
-    href: '/seletecdwork1.html',
-  },
-  {
     id: 2,
     image: '/images/selectedimage2.jpg',
     title: 'An Immersive Ecommerce Experience Inspired by Indian Artistry',
@@ -24,6 +17,13 @@ const PROJECTS = [
     title: 'Designing an Immersive Editorial Platform for Music Discovery & Storytelling',
     tag: 'UI Design',
     href: '/selectedwork3.html',
+  },
+  {
+    id: 1,
+    image: '/images/selectedimage1.jpg',
+    title: 'Where Personal Development Meets Organizational Innovation',
+    tag: 'Product Design',
+    href: '/seletecdwork1.html',
   },
   {
     id: 4,
